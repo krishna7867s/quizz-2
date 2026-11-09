@@ -386,6 +386,7 @@
                       <th class="num-cell">Total OC</th>
                       <th class="num-cell">Sobreprecio</th>
                       <th>Diagnostico</th>
+                      <th>Documento</th>
                     </tr>
                   </thead>
                   <tbody id="tbody-ordenes-auditoria"></tbody>
@@ -426,6 +427,7 @@
           <div class="subnav-bar" data-group="cir">
             <button type="button" class="subnav-btn active" data-sub="sub-cir-diagrama">01. Circuito de Compra y Three-Way Match (A1.a)</button>
             <button type="button" class="subnav-btn" data-sub="sub-cir-matriz">02. Matriz de Aprobacion y Firma de Ordenes (A1.b)</button>
+            <button type="button" class="subnav-btn" data-sub="sub-cir-3way">03. Simulador Three-Way Match en Vivo</button>
           </div>
 
           <div id="sub-cir-diagrama" class="subview-pane active" data-group="cir">
@@ -546,6 +548,57 @@
                   </div>
                   <div id="bandeja-oc-pendientes"></div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-cir-3way" class="subview-pane" data-group="cir">
+            <div class="split-2col">
+              <div class="panel-box" style="margin-bottom: 0;">
+                <div class="panel-header">
+                  <div class="panel-title-wrap">
+                    <span class="panel-tag">POST /three-way-match</span>
+                    <h2 class="panel-title">Cotejo Contable: OC vs. Boleta de Recepcion vs. Factura</h2>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <form id="form-three-way" class="clean-form-grid">
+                    <div class="field-group full">
+                      <label class="field-label" for="twm-oc">1. Seleccionar Orden de Compra Emitida</label>
+                      <select id="twm-oc" class="field-select"></select>
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="twm-cant-rec">2. Cantidad Fisica Recibida en Bodega</label>
+                      <input type="number" id="twm-cant-rec" class="field-input" value="300" min="0" required />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="twm-num-fact">3. N° Factura Electronica del Proveedor</label>
+                      <input type="text" id="twm-num-fact" class="field-input" value="FE-00100029481" required />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="twm-cant-fact">Cantidad Cobrada en Factura</label>
+                      <input type="number" id="twm-cant-fact" class="field-input" value="300" min="1" required />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="twm-precio-fact">Precio Unitario en Factura (₡)</label>
+                      <input type="number" id="twm-precio-fact" class="field-input" value="6300" min="1" required />
+                    </div>
+                    <div class="field-group full" style="display: flex; flex-direction: row; justify-content: space-between; gap: 0.75rem; padding-top: 0.5rem;">
+                      <button type="button" id="btn-twm-discrepancia" class="btn-tech">SIMULAR FACTURA CON FALTANTE / SOBREPRECIO</button>
+                      <button type="submit" class="btn-tech btn-primary">EJECUTAR COTEJO DE TRES VIAS</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div class="panel-box" style="margin-bottom: 0;">
+                <div class="panel-header">
+                  <div class="panel-title-wrap">
+                    <span class="panel-tag">DICTAMEN DE CUENTAS POR PAGAR</span>
+                    <h2 class="panel-title">Resultado de Validacion Documental</h2>
+                  </div>
+                </div>
+                <div class="panel-body" id="resultado-three-way-panel"></div>
               </div>
             </div>
           </div>

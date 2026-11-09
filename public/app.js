@@ -151,6 +151,7 @@ async function cargarDashboard() {
   renderizarTablaA2();
   renderizarMatrizProveedores(data.proveedores_evaluacion);
   renderizarPromocionesOpcion3(data.promociones_opcion3);
+  inicializarThreeWayMatch(data.auditoria_gasto.lineas_analizadas);
 }
 
 function renderizarPromocionesOpcion3(promoData) {
@@ -180,6 +181,94 @@ function renderizarPromocionesOpcion3(promoData) {
       </tr>
     `;
   }).join('');
+}
+
+async function ejecutarCotejoThreeWay(payload) {
+  const res = await fetch('/api/three-way-match', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  const panel = document.getElementById('resultado-three-way-panel');
+  if (!panel || !res.ok) return;
+
+  const exito = data.resultado_match === 'COTEJO_EXITOSO_PAGO_AUTORIZADO';
+  panel.innerHTML = `
+    <div style="border: 2px solid ${exito ? 'var(--oxide)' : 'var(--vermilion)'}; padding: 1.35rem; background: ${exito ? 'var(--oxide-soft)' : 'var(--vermilion-soft)'}; margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span class="status-pill ${exito ? 'pill-ok' : 'pill-critical'}">${data.resultado_match}</span>
+        <span style="font-family: var(--font-mono); font-weight: 700;">${data.orden_compra} // ${data.numero_factura}</span>
+      </div>
+      <div style="font-weight: 700; font-size: 1rem;">${data.material} — ${data.proveedor}</div>
+      <div style="font-family: var(--font-mono); font-size: 0.82rem; margin-top: 0.45rem;">
+        Monto Facturado: <strong>${formatoColones(data.monto_facturado_colones)}</strong> &nbsp;|&nbsp;
+        Monto Autorizado a Pagar: <strong>${formatoColones(data.monto_autorizado_colones)}</strong>
+      </div>
+    </div>
+
+    <div class="split-3col" style="margin-bottom: 1.25rem; gap: 0.85rem;">
+      <div style="border: 1px solid var(--line-subtle); padding: 0.85rem; background: var(--bg-canvas);">
+        <div class="field-label">1. ORDEN DE COMPRA</div>
+        <div style="font-family: var(--font-mono); font-size: 0.85rem; margin-top: 0.25rem;">
+          Cant: <strong>${data.comparativa.oc_cantidad}</strong><br/>
+          Precio: <strong>${formatoColones(data.comparativa.oc_precio)}</strong>
+        </div>
+      </div>
+      <div style="border: 1px solid var(--line-subtle); padding: 0.85rem; background: var(--bg-canvas);">
+        <div class="field-label">2. RECEPCION CIEGA</div>
+        <div style="font-family: var(--font-mono); font-size: 0.85rem; margin-top: 0.25rem;">
+          Cant. Fisica: <strong>${data.comparativa.recepcion_cantidad}</strong><br/>
+          Contrato: <strong>${formatoColones(data.comparativa.contrato_precio)}</strong>
+        </div>
+      </div>
+      <div style="border: 1px solid var(--line-subtle); padding: 0.85rem; background: var(--bg-canvas);">
+        <div class="field-label">3. FACTURA XML</div>
+        <div style="font-family: var(--font-mono); font-size: 0.85rem; margin-top: 0.25rem;">
+          Cant. Cobrada: <strong>${data.comparativa.factura_cantidad}</strong><br/>
+          Precio Cobrado: <strong>${formatoColones(data.comparativa.factura_precio)}</strong>
+        </div>
+      </div>
+    </div>
+
+    ${data.discrepancias.length > 0 ? `
+      <div style="border-left: 3px solid var(--vermilion); padding-left: 1rem;">
+        <div class="field-label" style="color: var(--vermilion); margin-bottom: 0.35rem;">CAUSAS DE RETENCION DEL PAGO:</div>
+        ${data.discrepancias.map((d) => `<div style="font-size: 0.82rem; margin-bottom: 0.35rem; color: var(--ink-primary);">• ${d}</div>`).join('')}
+      </div>
+    ` : `
+      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--oxide); font-weight: 600;">
+        Cruce exacto en las tres vias: cantidad recibida igual a facturada y tarifa conforme al Contrato Marco. Listo para transferencia SINPE.
+      </div>
+    `}
+  `;
+}
+
+function inicializarThreeWayMatch(ordenes) {
+  const sel = document.getElementById('twm-oc');
+  if (!sel || !ordenes) return;
+
+  if (sel.options.length === 0) {
+    sel.innerHTML = ordenes.map((o) =>
+      `<option value="${o.id}" data-cant="${o.cantidad}" data-precio="${o.precio_unitario_colones}">${o.numero_oc} — ${o.descripcion_erp_original} (${o.cantidad} u. @ ₡${o.precio_unitario_colones})</option>`
+    ).join('');
+    sel.value = '7'; // OC-1061 (300 sacos a 6300)
+
+    sel.addEventListener('change', () => {
+      const opt = sel.options[sel.selectedIndex];
+      document.getElementById('twm-cant-rec').value = opt.dataset.cant;
+      document.getElementById('twm-cant-fact').value = opt.dataset.cant;
+      document.getElementById('twm-precio-fact').value = opt.dataset.precio;
+    });
+  }
+
+  ejecutarCotejoThreeWay({
+    orden_compra_id: Number(sel.value || 7),
+    cantidad_recibida_bodega: Number(document.getElementById('twm-cant-rec').value),
+    cantidad_facturada: Number(document.getElementById('twm-cant-fact').value),
+    precio_unitario_facturado: Number(document.getElementById('twm-precio-fact').value),
+    numero_factura: document.getElementById('twm-num-fact').value
+  });
 }
 
 function renderizarResumenMateriales(materiales) {
@@ -320,7 +409,7 @@ function renderizarTablaMateriales(materiales) {
   });
 }
 
-function renderizarCurvaAgotamiento(materiales, materialIdForzado) {
+function renderizarCurvaAgotamiento(materiales, materialIdForzado, overrideParams = null) {
   const sel = document.getElementById('sel-curva-material');
   const contSvg = document.getElementById('contenedor-svg-curva');
   const contMet = document.getElementById('contenedor-metricas-curva');
@@ -337,7 +426,29 @@ function renderizarCurvaAgotamiento(materiales, materialIdForzado) {
   }
 
   const matId = Number(materialIdForzado || sel.value || 4);
-  const m = materiales.find((x) => x.id === matId) || materiales[0];
+  const baseMat = materiales.find((x) => x.id === matId) || materiales[0];
+
+  const dProm = overrideParams ? Number(overrideParams.dProm) : Number(baseMat.demanda_diaria_prom);
+  const dMax = overrideParams ? Math.max(dProm, Number(overrideParams.dMax)) : Number(baseMat.demanda_diaria_max);
+  const leadTime = overrideParams ? Math.max(0.5, Number(overrideParams.leadTime)) : Number(baseMat.tiempo_entrega_dias);
+  const stockAct = overrideParams ? Math.max(0, Number(overrideParams.stockAct)) : Number(baseMat.stock_actual);
+
+  const ssCalc = Number(((dMax - dProm) * leadTime).toFixed(2));
+  const prCalc = Number(((dProm * leadTime) + ssCalc).toFixed(2));
+  const reqHoy = stockAct <= prCalc;
+  const auton = dProm > 0 ? Number((stockAct / dProm).toFixed(2)) : 999;
+
+  const m = {
+    ...baseMat,
+    demanda_diaria_prom: dProm,
+    demanda_diaria_max: dMax,
+    tiempo_entrega_dias: leadTime,
+    stock_actual: stockAct,
+    stock_seguridad: ssCalc,
+    punto_reorden: prCalc,
+    requiere_reposicion_hoy: reqHoy,
+    dias_autonomia: auton
+  };
 
   const maxY = Math.max(m.stock_actual * 1.25, m.punto_reorden * 1.35, 10);
   const diasHorizonte = Math.max(7, Math.ceil(m.tiempo_entrega_dias * 2));
@@ -393,23 +504,50 @@ function renderizarCurvaAgotamiento(materiales, materialIdForzado) {
   `;
 
   contMet.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
-      <span class="sku-tag">${m.codigo_estandar}</span>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+      <span class="sku-tag">${m.codigo_estandar} // CALCULADORA WHAT-IF</span>
       <span class="status-pill ${m.requiere_reposicion_hoy ? 'pill-critical' : 'pill-ok'}">
         ${m.requiere_reposicion_hoy ? 'REPOSICION OBLIGATORIA HOY' : 'DENTRO DE MARGEN'}
       </span>
     </div>
-    <h3 style="font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.75rem;">${m.nombre_estandar}</h3>
-    <div style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.8; color: var(--ink-secondary); margin-bottom: 1.25rem;">
-      • <strong>Stock de Seguridad (SS):</strong> (${m.demanda_diaria_max} − ${m.demanda_diaria_prom}) × ${m.tiempo_entrega_dias}d = <strong>${m.stock_seguridad} ${m.unidad_medida}</strong><br/>
-      • <strong>Punto de Reorden (PR):</strong> (${m.demanda_diaria_prom} × ${m.tiempo_entrega_dias}d) + ${m.stock_seguridad} = <strong>${m.punto_reorden} ${m.unidad_medida}</strong><br/>
-      • <strong>Autonomia actual:</strong> ${m.dias_autonomia} dias<br/>
-      • <strong>Mejor proveedor (Opcion 1):</strong> ${m.proveedor_sugerido ? `${m.proveedor_sugerido.nombre_comercial} (${formatoColones(m.proveedor_sugerido.precio_colones)})` : 'Contrato Marco'}
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-bottom: 0.9rem; background: var(--bg-canvas); padding: 0.75rem; border: 1px solid var(--line-subtle);">
+      <div>
+        <label class="field-label" style="font-size: 0.63rem;">Dem. Prom (d)</label>
+        <input type="number" id="sim-d-prom" class="field-input" value="${m.demanda_diaria_prom}" step="1" style="width: 100%; padding: 0.35rem;" />
+      </div>
+      <div>
+        <label class="field-label" style="font-size: 0.63rem;">Dem. Max</label>
+        <input type="number" id="sim-d-max" class="field-input" value="${m.demanda_diaria_max}" step="1" style="width: 100%; padding: 0.35rem;" />
+      </div>
+      <div>
+        <label class="field-label" style="font-size: 0.63rem;">Entrega L (d)</label>
+        <input type="number" id="sim-lead" class="field-input" value="${m.tiempo_entrega_dias}" step="0.5" style="width: 100%; padding: 0.35rem;" />
+      </div>
+      <div>
+        <label class="field-label" style="font-size: 0.63rem;">Stock Actual</label>
+        <input type="number" id="sim-stock" class="field-input" value="${m.stock_actual}" step="1" style="width: 100%; padding: 0.35rem;" />
+      </div>
+    </div>
+    <div style="font-family: var(--font-mono); font-size: 0.79rem; line-height: 1.75; color: var(--ink-secondary); margin-bottom: 1rem;">
+      • <strong>SS = (d_max − d) × L:</strong> (${m.demanda_diaria_max} − ${m.demanda_diaria_prom}) × ${m.tiempo_entrega_dias} = <strong>${m.stock_seguridad} ${m.unidad_medida}</strong><br/>
+      • <strong>PR = (d × L) + SS:</strong> (${m.demanda_diaria_prom} × ${m.tiempo_entrega_dias}) + ${m.stock_seguridad} = <strong>${m.punto_reorden} ${m.unidad_medida}</strong><br/>
+      • <strong>Autonomia actual:</strong> ${m.dias_autonomia} dias | <strong>Proveedor optimo:</strong> ${m.proveedor_sugerido ? `${m.proveedor_sugerido.nombre_comercial.split(' ')[0]} (${formatoColones(m.proveedor_sugerido.precio_colones)})` : 'Contrato Marco'}
     </div>
     <button type="button" id="btn-auto-oc-curva" class="btn-tech btn-primary" style="width: 100%; justify-content: center;">
       GENERAR OC CON PROVEEDOR MAS BARATO (${formatoNumero(m.cantidad_sugerida_oc)} ${m.unidad_medida})
     </button>
   `;
+
+  ['sim-d-prom', 'sim-d-max', 'sim-lead', 'sim-stock'].forEach((inputId) => {
+    document.getElementById(inputId)?.addEventListener('change', () => {
+      renderizarCurvaAgotamiento(materiales, matId, {
+        dProm: document.getElementById('sim-d-prom').value,
+        dMax: document.getElementById('sim-d-max').value,
+        leadTime: document.getElementById('sim-lead').value,
+        stockAct: document.getElementById('sim-stock').value
+      });
+    });
+  });
 
   document.getElementById('btn-auto-oc-curva')?.addEventListener('click', async () => {
     const provId = m.proveedor_sugerido ? m.proveedor_sugerido.proveedor_id : (m.proveedor_contrato_id || 1);
@@ -587,9 +725,98 @@ function renderizarAuditoriaGasto(auditoria) {
           ${formatoColones(oc.sobreprecio_total_calculado)}
         </td>
         <td>${pill}</td>
+        <td>
+          <button type="button" class="btn-tech btn-ver-oc-doc" data-id="${oc.id}" style="padding: 0.35rem 0.65rem;">
+            VER OC
+          </button>
+        </td>
       </tr>
     `;
   }).join('');
+
+  tbody.querySelectorAll('.btn-ver-oc-doc').forEach((btn) => {
+    btn.addEventListener('click', () => abrirComprobanteOC(Number(btn.dataset.id)));
+  });
+}
+
+function abrirComprobanteOC(ocId) {
+  if (!estadoGlobal || !estadoGlobal.auditoria_gasto) return;
+  const oc = estadoGlobal.auditoria_gasto.lineas_analizadas.find((o) => o.id === ocId);
+  if (!oc) return;
+
+  document.getElementById('drawer-sku').textContent = `COMPROBANTE FORMAL // ${oc.numero_oc}`;
+  document.getElementById('drawer-title').textContent = `Orden de Compra ${oc.numero_oc} — Constructora Del Valle S.A.`;
+
+  const body = document.getElementById('drawer-body-content');
+  body.innerHTML = `
+    <div style="border: 2px solid var(--line-strong); padding: 1.75rem; background: var(--bg-surface);">
+      <div style="display: flex; justify-content: space-between; border-bottom: 2px solid var(--line-strong); padding-bottom: 1rem; margin-bottom: 1.25rem;">
+        <div>
+          <div style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700;">CONSTRUCTORA DEL VALLE S.A.</div>
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-secondary);">Cedula Juridica: 3-101-482910 | Departamento de Abastecimiento</div>
+        </div>
+        <div style="text-align: right; font-family: var(--font-mono);">
+          <div style="font-size: 1.15rem; font-weight: 700;">${oc.numero_oc}</div>
+          <div style="font-size: 0.75rem;">Fecha Emision: ${oc.fecha_emision}</div>
+        </div>
+      </div>
+
+      <div class="split-2col-equal" style="margin-bottom: 1.25rem;">
+        <div style="border: 1px solid var(--line-subtle); padding: 0.9rem; background: var(--bg-canvas);">
+          <div class="field-label">PROVEEDOR ADJUDICADO</div>
+          <div style="font-weight: 700; margin-top: 0.25rem;">${oc.proveedor_nombre} (${oc.proveedor_codigo})</div>
+          <div style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-secondary);">
+            Contrato Marco: ${oc.tiene_contrato_marco ? 'ACTIVO (CM-2026-001)' : 'NO POSEE CONTRATO VIGENTE'}
+          </div>
+        </div>
+        <div style="border: 1px solid var(--line-subtle); padding: 0.9rem; background: var(--bg-canvas);">
+          <div class="field-label">CENTRO DE COSTO Y AUTORIZACION A1</div>
+          <div style="font-weight: 700; margin-top: 0.25rem;">Area: ${oc.area_solicitante}</div>
+          <div style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-secondary);">
+            Nivel Exigido: ${oc.rol_aprobador_requerido} (${oc.cotizaciones_presentadas}/${oc.cotizaciones_requeridas} cotizaciones)
+          </div>
+        </div>
+      </div>
+
+      <table class="clean-table" style="border: 1px solid var(--line-strong); margin-bottom: 1.25rem;">
+        <thead>
+          <tr>
+            <th>SKU Estandar</th>
+            <th>Descripcion en Orden</th>
+            <th class="num-cell">Cantidad</th>
+            <th class="num-cell">Precio OC</th>
+            <th class="num-cell">Tarifa Contrato</th>
+            <th class="num-cell">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="sku-tag">${oc.codigo_estandar}</span></td>
+            <td><strong>${oc.descripcion_erp_original}</strong></td>
+            <td class="num-cell">${formatoNumero(oc.cantidad)} ${oc.unidad_medida}</td>
+            <td class="num-cell">${formatoColones(oc.precio_unitario_colones)}</td>
+            <td class="num-cell">${formatoColones(oc.precio_contrato_oficial)}</td>
+            <td class="num-cell" style="font-weight: 700;">${formatoColones(oc.monto_total_colones)}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--line-subtle);">
+        <div>
+          <span class="status-pill ${oc.estado_aprobacion === 'APROBADA' ? 'pill-ok' : 'pill-critical'}">
+            ESTADO: ${oc.estado_aprobacion}
+          </span>
+          <div style="font-family: var(--font-mono); font-size: 0.74rem; margin-top: 0.35rem; color: var(--ink-secondary);">
+            Firmado por: ${oc.aprobado_por || 'PENDIENTE DE FIRMA'} | Sobreprecio detectado: ${formatoColones(oc.sobreprecio_total_calculado)}
+          </div>
+        </div>
+        <button type="button" onclick="window.print()" class="btn-tech btn-primary">IMPRIMIR COMPROBANTE OC</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('drawer-backdrop').classList.add('open');
+  document.getElementById('kardex-drawer').classList.add('open');
 }
 
 function renderizarCircuitoA1() {
@@ -744,42 +971,74 @@ function renderizarTablaA2() {
   }).join('');
 }
 
-function renderizarMatrizProveedores(evaluacion) {
+function renderizarMatrizProveedores(evaluacion, pesosCustom = null) {
   const tbodyA4 = document.getElementById('tbody-matriz-a4');
   const panelRanking = document.getElementById('panel-ranking-a4');
   const tbodyComp = document.getElementById('tbody-comparador-precios');
   if (!evaluacion || !tbodyA4) return;
 
-  const provs = evaluacion.ranking_proveedores_a4;
-  const construplaza = provs.find((p) => p.codigo === 'PROV-A');
-  const novex = provs.find((p) => p.codigo === 'PROV-NOV');
-  const epa = provs.find((p) => p.codigo === 'PROV-F');
+  const provsBase = evaluacion.ranking_proveedores_a4;
+  const construplaza = provsBase.find((p) => p.codigo === 'PROV-A');
+  const novex = provsBase.find((p) => p.codigo === 'PROV-NOV');
+  const epa = provsBase.find((p) => p.codigo === 'PROV-F');
+
+  const pesosActivos = pesosCustom || evaluacion.criterios_ponderacion.map((c) => c.peso_pct);
+  const sumaPesos = pesosActivos.reduce((a, b) => a + Number(b), 0) || 100;
+
+  let totalC1 = 0;
+  let totalC2 = 0;
+  let totalC3 = 0;
 
   tbodyA4.innerHTML = evaluacion.criterios_ponderacion.map((c, idx) => {
-    const c1 = construplaza.desglose_criterios[idx];
-    const c2 = novex.desglose_criterios[idx];
-    const c3 = epa.desglose_criterios[idx];
+    const peso = Number(pesosActivos[idx]);
+    const factor = peso / sumaPesos;
+    const n1 = construplaza.desglose_criterios[idx].nota_1_a_5;
+    const n2 = novex.desglose_criterios[idx].nota_1_a_5;
+    const n3 = epa.desglose_criterios[idx].nota_1_a_5;
+
+    const p1 = n1 * factor;
+    const p2 = n2 * factor;
+    const p3 = n3 * factor;
+    totalC1 += p1;
+    totalC2 += p2;
+    totalC3 += p3;
+
     return `
       <tr>
         <td><strong>${c.nombre}</strong></td>
-        <td class="num-cell">${c.peso_pct}%</td>
-        <td class="num-cell">Nota ${c1.nota_1_a_5} &rarr; <strong>${c1.puntaje_ponderado.toFixed(2)}</strong></td>
-        <td class="num-cell">Nota ${c2.nota_1_a_5} &rarr; <strong>${c2.puntaje_ponderado.toFixed(2)}</strong></td>
-        <td class="num-cell">Nota ${c3.nota_1_a_5} &rarr; <strong>${c3.puntaje_ponderado.toFixed(2)}</strong></td>
+        <td class="num-cell">
+          <input type="number" class="field-input input-peso-a4" data-idx="${idx}" value="${peso}" min="0" max="100" style="width: 64px; padding: 0.25rem 0.4rem; text-align: right;" /> %
+        </td>
+        <td class="num-cell">Nota ${n1} &rarr; <strong>${p1.toFixed(2)}</strong></td>
+        <td class="num-cell">Nota ${n2} &rarr; <strong>${p2.toFixed(2)}</strong></td>
+        <td class="num-cell">Nota ${n3} &rarr; <strong>${p3.toFixed(2)}</strong></td>
       </tr>
     `;
   }).join('') + `
     <tr style="background: var(--bg-muted); font-weight: 700;">
-      <td>PUNTAJE PONDERADO TOTAL</td>
-      <td class="num-cell">100%</td>
-      <td class="num-cell" style="color: var(--oxide);">4.60 / 5.00</td>
-      <td class="num-cell" style="color: var(--cobalt);">4.40 / 5.00</td>
-      <td class="num-cell" style="color: var(--amber);">3.10 / 5.00</td>
+      <td>PUNTAJE PONDERADO TOTAL (Ajustable en vivo)</td>
+      <td class="num-cell">${sumaPesos}%</td>
+      <td class="num-cell" style="color: var(--oxide);">${totalC1.toFixed(2)} / 5.00</td>
+      <td class="num-cell" style="color: var(--cobalt);">${totalC2.toFixed(2)} / 5.00</td>
+      <td class="num-cell" style="color: var(--amber);">${totalC3.toFixed(2)} / 5.00</td>
     </tr>
   `;
 
+  tbodyA4.querySelectorAll('.input-peso-a4').forEach((inp) => {
+    inp.addEventListener('change', () => {
+      const nuevos = Array.from(tbodyA4.querySelectorAll('.input-peso-a4')).map((el) => Number(el.value || 0));
+      renderizarMatrizProveedores(evaluacion, nuevos);
+    });
+  });
+
+  const rankingDinamico = [
+    { ...construplaza, puntaje_total_5: totalC1, indice_desempeno_100: Number(((totalC1 / 5) * 100).toFixed(1)) },
+    { ...novex, puntaje_total_5: totalC2, indice_desempeno_100: Number(((totalC2 / 5) * 100).toFixed(1)) },
+    { ...epa, puntaje_total_5: totalC3, indice_desempeno_100: Number(((totalC3 / 5) * 100).toFixed(1)) }
+  ].sort((a, b) => b.puntaje_total_5 - a.puntaje_total_5);
+
   panelRanking.innerHTML = `
-    ${provs.map((p, i) => `
+    ${rankingDinamico.map((p, i) => `
       <div style="margin-bottom: 1.15rem;">
         <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.35rem;">
           <span>#${i + 1} ${p.nombre_comercial} (Credito ${p.plazo_credito_dias}d)</span>
@@ -1035,6 +1294,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('.btn-api-probe').forEach((btn) => {
     btn.addEventListener('click', () => ejecutarSondeoApi(btn.dataset.endpoint));
+  });
+
+  // Eventos del Validador Three-Way Match en vivo
+  document.getElementById('form-three-way')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    ejecutarCotejoThreeWay({
+      orden_compra_id: Number(document.getElementById('twm-oc').value),
+      cantidad_recibida_bodega: Number(document.getElementById('twm-cant-rec').value),
+      cantidad_facturada: Number(document.getElementById('twm-cant-fact').value),
+      precio_unitario_facturado: Number(document.getElementById('twm-precio-fact').value),
+      numero_factura: document.getElementById('twm-num-fact').value
+    });
+  });
+
+  document.getElementById('btn-twm-discrepancia')?.addEventListener('click', () => {
+    document.getElementById('twm-oc').value = '1'; // OC-1041
+    document.getElementById('twm-cant-rec').value = '185'; // Llegaron 15 sacos menos
+    document.getElementById('twm-cant-fact').value = '200'; // Cobran 200
+    document.getElementById('twm-precio-fact').value = '6450'; // Cobran con sobreprecio
+    ejecutarCotejoThreeWay({
+      orden_compra_id: 1,
+      cantidad_recibida_bodega: 185,
+      cantidad_facturada: 200,
+      precio_unitario_facturado: 6450,
+      numero_factura: 'FE-00100029510'
+    });
+    mostrarNotificacion('THREE-WAY MATCH: Factura bloqueada por faltante de 15 sacos y sobreprecio de 150 colones/u.');
   });
 
   // Boton Maximizar Vista (oculta/muestra sidebar y expande el lienzo al 100%)

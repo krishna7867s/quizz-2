@@ -266,6 +266,98 @@ router.post('/promociones/evaluar', (req, res) => {
   }
 });
 
+// POST /three-way-match -> Validador en vivo del Cotejo de Tres Vias (OC vs Recepcion Ciega vs Factura XML)
+router.post('/three-way-match', (req, res) => {
+  try {
+    const db = getDb();
+    const {
+      orden_compra_id,
+      cantidad_recibida_bodega,
+      cantidad_facturada,
+      precio_unitario_facturado,
+      numero_factura
+    } = req.body || {};
+
+    const oc = db.prepare(`
+      SELECT oc.*, m.nombre_estandar, m.codigo_estandar, m.unidad_medida, m.precio_contrato_colones, pr.nombre_comercial AS proveedor_nombre
+      FROM ordenes_compra oc
+      JOIN materiales m ON m.id = oc.material_id
+      JOIN proveedores pr ON pr.id = oc.proveedor_id
+      WHERE oc.id = ?
+    `).get(Number(orden_compra_id || 7));
+
+    if (!oc) {
+      return res.status(404).json({ error: 'Orden de Compra no encontrada.' });
+    }
+
+    const cantOC = Number(oc.cantidad);
+    const precioOC = Number(oc.precio_unitario_colones);
+    const precioContrato = Number(oc.precio_referencia_contrato || oc.precio_contrato_colones || precioOC);
+
+    const cantRec = Number(cantidad_recibida_bodega ?? cantOC);
+    const cantFact = Number(cantidad_facturada ?? cantOC);
+    const precioFact = Number(precio_unitario_facturado ?? precioOC);
+
+    const discrepancias = [];
+
+    if (cantFact > cantRec) {
+      discrepancias.push(
+        `DISCREPANCIA DE CANTIDAD: El proveedor factura ${cantFact} ${oc.unidad_medida}, pero Bodega solo recibio fisicamente ${cantRec} ${oc.unidad_medida} (Diferencia no recibida: ${cantFact - cantRec} ${oc.unidad_medida} = ${(cantFact - cantRec) * precioFact} colones).`
+      );
+    }
+
+    if (cantRec > cantOC) {
+      discrepancias.push(
+        `EXCESO SOBRE ORDEN: Bodega reporta ${cantRec} ${oc.unidad_medida}, superando las ${cantOC} ${oc.unidad_medida} autorizadas en la ${oc.numero_oc}.`
+      );
+    }
+
+    if (precioFact > precioOC) {
+      discrepancias.push(
+        `SOBREPRECIO EN FACTURA: La factura cobra ${precioFact} colones/u, superior al precio pactado en ${oc.numero_oc} (${precioOC} colones/u).`
+      );
+    }
+
+    if (precioFact > precioContrato) {
+      discrepancias.push(
+        `DESVIACION DE CONTRATO MARCO: El precio facturado (${precioFact} colones/u) excede la tarifa oficial de contrato (${precioContrato} colones/u). Sobreprecio total: ${(precioFact - precioContrato) * cantFact} colones.`
+      );
+    }
+
+    if (oc.estado_aprobacion === 'OBSERVADA_DUPLICADO' || oc.estado_aprobacion === 'RECHAZADA') {
+      discrepancias.push(
+        `ORDEN BLOQUEADA EN AUDITORIA: La orden ${oc.numero_oc} tiene estado ${oc.estado_aprobacion} y no puede liquidarse.`
+      );
+    }
+
+    const aprobadoParaPago = discrepancias.length === 0;
+    const montoFacturado = Number((cantFact * precioFact).toFixed(2));
+    const montoAutorizadoPagar = aprobadoParaPago ? Number((cantRec * precioContrato).toFixed(2)) : 0;
+
+    return res.json({
+      orden_compra: oc.numero_oc,
+      proveedor: oc.proveedor_nombre,
+      material: `${oc.codigo_estandar} — ${oc.nombre_estandar}`,
+      numero_factura: numero_factura || 'FE-00100029481',
+      comparativa: {
+        oc_cantidad: cantOC,
+        oc_precio: precioOC,
+        recepcion_cantidad: cantRec,
+        factura_cantidad: cantFact,
+        factura_precio: precioFact,
+        contrato_precio: precioContrato
+      },
+      monto_facturado_colones: montoFacturado,
+      monto_autorizado_colones: montoAutorizadoPagar,
+      retencion_fuga_colones: Math.max(0, montoFacturado - montoAutorizadoPagar),
+      resultado_match: aprobadoParaPago ? 'COTEJO_EXITOSO_PAGO_AUTORIZADO' : 'FACTURA_RETENIDA_POR_DISCREPANCIA',
+      discrepancias
+    });
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
 // POST /reset -> Restaura los datos semilla para demostracion en vivo
 router.post('/reset', (req, res) => {
   try {
