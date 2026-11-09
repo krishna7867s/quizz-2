@@ -5,6 +5,8 @@
 
 PRAGMA foreign_keys = ON;
 
+DROP TABLE IF EXISTS auditoria_promociones;
+DROP TABLE IF EXISTS promociones;
 DROP TABLE IF EXISTS alertas;
 DROP TABLE IF EXISTS historico_precios_proveedor;
 DROP TABLE IF EXISTS equivalencias_proveedor;
@@ -183,6 +185,41 @@ CREATE TABLE historico_precios_proveedor (
     variacion_porcentual REAL NOT NULL DEFAULT 0,
     FOREIGN KEY (material_id) REFERENCES materiales(id),
     FOREIGN KEY (proveedor_id) REFERENCES proveedores(id)
+);
+
+-- 10. Motor de Codigos de Promocion y Descuentos (Integracion Opcion 3 — Caso Joaquin, AON)
+CREATE TABLE promociones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    codigo_promo TEXT NOT NULL UNIQUE,
+    nombre TEXT NOT NULL,
+    proveedor_id INTEGER NOT NULL,
+    fecha_inicio TEXT NOT NULL,
+    fecha_fin TEXT NOT NULL,
+    tipo_descuento TEXT NOT NULL CHECK (tipo_descuento IN ('PORCENTAJE', 'MONTO_FIJO', 'ESCALONADO_VOLUMEN', 'BONIFICACION_2X1')),
+    valor_descuento REAL NOT NULL,
+    monto_minimo_oc REAL NOT NULL DEFAULT 0,
+    cantidad_minima REAL NOT NULL DEFAULT 0,
+    categoria_aplicable TEXT,
+    material_id INTEGER,
+    prioridad INTEGER NOT NULL DEFAULT 1,
+    acumulable INTEGER NOT NULL DEFAULT 0,
+    activa INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (proveedor_id) REFERENCES proveedores(id),
+    FOREIGN KEY (material_id) REFERENCES materiales(id)
+);
+
+CREATE TABLE auditoria_promociones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    orden_compra_id INTEGER,
+    referencia_caso TEXT NOT NULL,
+    fecha_evaluacion TEXT NOT NULL DEFAULT (datetime('now')),
+    codigo_promo_aplicada TEXT,
+    monto_bruto_colones REAL NOT NULL,
+    ahorro_aplicado_colones REAL NOT NULL DEFAULT 0,
+    monto_neto_colones REAL NOT NULL,
+    regla_resolucion TEXT NOT NULL,
+    promociones_descartadas_json TEXT NOT NULL DEFAULT '[]',
+    FOREIGN KEY (orden_compra_id) REFERENCES ordenes_compra(id)
 );
 
 CREATE INDEX idx_oc_material_prov_fecha ON ordenes_compra(material_id, proveedor_id, fecha_emision);

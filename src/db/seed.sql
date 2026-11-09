@@ -341,3 +341,41 @@ INSERT INTO historico_precios_proveedor (material_id, proveedor_id, precio_colon
 (6, 7, 2450, '2026-10-28 06:00:00', 'Contrato Marco CM-2026-002', 0.0),
 (6, 1, 2520, '2026-10-28 06:00:00', 'Contrato Marco CM-2026-001', 0.0),
 (6, 6, 2900, '2026-10-28 06:00:00', 'Lista Precios EPA CSV', 3.57);
+
+-- 10. Tabla de Promociones Negociadas con Proveedores (Integracion Opcion 3 — Caso Joaquin, AON)
+INSERT INTO promociones (
+    id, codigo_promo, nombre, proveedor_id, fecha_inicio, fecha_fin,
+    tipo_descuento, valor_descuento, monto_minimo_oc, cantidad_minima,
+    categoria_aplicable, material_id, prioridad, acumulable, activa
+) VALUES
+(
+    1, 'PROMO-CPL-VOL8', 'Descuento 8% por Lote Mayorista de Obra Gris (>= 250 unid.)',
+    1, '2026-10-01', '2026-12-31',
+    'PORCENTAJE', 8.0, 1200000, 250,
+    'MAT-OBR', NULL, 1, 0, 1
+),
+(
+    2, 'PROMO-CPL-BONO75K', 'Bono Fijo de 75 000 colones en Compras Superiores a 1.5M',
+    1, '2026-10-01', '2026-12-31',
+    'MONTO_FIJO', 75000, 1500000, 100,
+    'MAT-OBR', NULL, 2, 0, 1
+),
+(
+    3, 'PROMO-SEP-VENCIDA', 'Promocion Trimestre Anterior Cemento 10% (Vencida)',
+    1, '2026-07-01', '2026-09-30',
+    'PORCENTAJE', 10.0, 500000, 100,
+    'MAT-OBR', 1, 1, 0, 1
+),
+(
+    4, 'PROMO-NVX-HID12', 'Descuento 12% Especial en Tuberias e Hidrosanitarios Novex',
+    7, '2026-10-01', '2026-11-30',
+    'PORCENTAJE', 12.0, 50000, 20,
+    'MEC-HID', NULL, 1, 0, 1
+),
+(
+    5, 'PROMO-EPP-2X1', 'Bonificacion 2x1 en Lotes de Seguridad Ocupacional (>= 200 pares)',
+    5, '2026-10-01', '2026-12-31',
+    'BONIFICACION_2X1', 50.0, 150000, 200,
+    'SEG-EPP', 5, 1, 0, 1
+);
+

@@ -66,6 +66,22 @@ body {
   display: grid;
   grid-template-columns: 272px 1fr;
   min-height: 100vh;
+  transition: grid-template-columns 0.35s var(--ease-out-expo);
+}
+
+.app-shell.sidebar-collapsed {
+  grid-template-columns: 0px 1fr;
+}
+
+.app-shell.sidebar-collapsed .app-sidebar {
+  overflow: hidden;
+  border-right: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-shell.sidebar-collapsed .stage-content {
+  max-width: 1680px;
 }
 
 /* Barra lateral izquierda */

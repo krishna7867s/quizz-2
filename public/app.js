@@ -150,6 +150,36 @@ async function cargarDashboard() {
   renderizarBandejaAprobaciones(data.auditoria_gasto.lineas_analizadas);
   renderizarTablaA2();
   renderizarMatrizProveedores(data.proveedores_evaluacion);
+  renderizarPromocionesOpcion3(data.promociones_opcion3);
+}
+
+function renderizarPromocionesOpcion3(promoData) {
+  const tbody = document.getElementById('tbody-promociones-casos');
+  if (!tbody || !promoData) return;
+
+  tbody.innerHTML = (promoData.cinco_casos_prueba || []).map((c, idx) => {
+    const descHtml = (c.promociones_descartadas || []).map((d) =>
+      `<div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-secondary); margin-bottom: 3px;">• <strong>${d.codigo_promo}:</strong> ${d.motivo_descarte}</div>`
+    ).join('') || '<span style="color: var(--ink-muted); font-size: 0.75rem;">Ninguna descartada</span>';
+
+    return `
+      <tr class="stagger-row" style="--idx: ${idx};">
+        <td><strong>${c.referencia_caso}</strong></td>
+        <td>${c.material} (<span class="sku-tag">${c.categoria}</span>)</td>
+        <td class="num-cell">${formatoColones(c.monto_bruto_colones)}</td>
+        <td>
+          ${c.promocion_aplicada
+            ? `<span class="status-pill pill-ok">${c.promocion_aplicada.codigo_promo}</span>`
+            : `<span class="status-pill pill-warning">NINGUNA APLICABLE</span>`}
+        </td>
+        <td class="num-cell" style="font-weight: 700; color: ${c.ahorro_aplicado_colones > 0 ? 'var(--oxide)' : 'var(--ink-muted)'};">
+          ${formatoColones(c.ahorro_aplicado_colones)}
+        </td>
+        <td class="num-cell" style="font-weight: 700;">${formatoColones(c.monto_neto_colones)}</td>
+        <td>${descHtml}</td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function renderizarResumenMateriales(materiales) {
@@ -1005,5 +1035,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('.btn-api-probe').forEach((btn) => {
     btn.addEventListener('click', () => ejecutarSondeoApi(btn.dataset.endpoint));
+  });
+
+  // Boton Maximizar Vista (oculta/muestra sidebar y expande el lienzo al 100%)
+  document.getElementById('btn-toggle-maximize')?.addEventListener('click', (e) => {
+    const shell = document.querySelector('.app-shell');
+    const colapsado = shell.classList.toggle('sidebar-collapsed');
+    e.currentTarget.textContent = colapsado ? 'MOSTRAR MENU LATERAL' : 'MAXIMIZAR VISTA';
+  });
+
+  // Boton Exportar CSV de Inventario y Punto de Reorden
+  document.getElementById('btn-export-csv')?.addEventListener('click', () => {
+    if (!estadoGlobal || !estadoGlobal.materiales) return;
+    const encabezados = ['Prioridad', 'SKU', 'Material', 'Unidad', 'Demanda_Prom', 'Demanda_Max', 'Entrega_Dias', 'Stock_Seguridad', 'Punto_Reorden', 'Stock_Actual', 'Reponer_Hoy'];
+    const filas = estadoGlobal.materiales.map((m) => [
+      m.orden_prioridad_global,
+      m.codigo_estandar,
+      `"${m.nombre_estandar}"`,
+      m.unidad_medida,
+      m.demanda_diaria_prom,
+      m.demanda_diaria_max,
+      m.tiempo_entrega_dias,
+      m.stock_seguridad,
+      m.punto_reorden,
+      m.stock_actual,
+      m.requiere_reposicion_hoy ? 'SI' : 'NO'
+    ]);
+    const csvContent = [encabezados.join(','), ...filas.map((f) => f.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'reporte_inventario_constructora_del_valle.csv';
+    link.click();
+    URL.revokeObjectURL(url);
+    mostrarNotificacion('ARCHIVO CSV EXPORTADO CORRECTAMENTE.');
   });
 });

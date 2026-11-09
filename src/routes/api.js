@@ -13,6 +13,10 @@ const {
   aprobarOrdenCompra,
   obtenerMatrizProveedoresYComparador
 } = require('../services/aprobaciones');
+const {
+  evaluarPromocionesParaOrden,
+  ejecutarCincoCasosPruebaPromociones
+} = require('../services/promociones');
 
 const router = express.Router();
 
@@ -24,6 +28,7 @@ router.get('/dashboard', (req, res) => {
     const alertasReorden = obtenerAlertasReorden(db);
     const auditoriaGasto = analizarDuplicadosYFugas(db);
     const proveedoresMatriz = obtenerMatrizProveedoresYComparador(db);
+    const promocionesAuditoria = ejecutarCincoCasosPruebaPromociones(db);
     const ubicaciones = db.prepare('SELECT * FROM ubicaciones ORDER BY id ASC').all();
     const matrizAprobacion = db.prepare('SELECT * FROM matriz_aprobacion ORDER BY nivel ASC').all();
     const ultimosMovimientos = db.prepare(`
@@ -80,6 +85,7 @@ router.get('/dashboard', (req, res) => {
       alertas_reorden: alertasReorden,
       auditoria_gasto: auditoriaGasto,
       proveedores_evaluacion: proveedoresMatriz,
+      promociones_opcion3: promocionesAuditoria,
       ultimos_movimientos: ultimosMovimientos,
       alertas_activas: alertasActivas
     });
@@ -237,6 +243,26 @@ router.get('/proveedores/comparador', (req, res) => {
     return res.json(obtenerMatrizProveedoresYComparador(db));
   } catch (err) {
     return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /promociones/auditoria -> Motor de codigos de promocion y los 5 casos de prueba (Opcion 3)
+router.get('/promociones/auditoria', (req, res) => {
+  try {
+    const db = getDb();
+    return res.json(ejecutarCincoCasosPruebaPromociones(db));
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /promociones/evaluar -> Evalua promociones vigentes para cualquier OC
+router.post('/promociones/evaluar', (req, res) => {
+  try {
+    const db = getDb();
+    return res.json(evaluarPromocionesParaOrden(db, req.body || {}));
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
   }
 });
 

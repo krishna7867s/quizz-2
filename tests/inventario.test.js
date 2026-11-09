@@ -14,6 +14,7 @@ const {
   aprobarOrdenCompra,
   obtenerMatrizProveedoresYComparador
 } = require('../src/services/aprobaciones');
+const { ejecutarCincoCasosPruebaPromociones } = require('../src/services/promociones');
 
 test('Ejercicio A5: Calculo exacto de Stock de Seguridad (SS) y Punto de Reorden (PR)', () => {
   const db = getDb({ freshMemory: true });
@@ -162,5 +163,24 @@ test('Integridad de Archivos de Entregables (Esquema SQL, Seed SQL, Dashboard e 
   assert.ok(fs.existsSync(path.join(root, 'public', 'informe.html')));
   assert.ok(fs.existsSync(path.join(root, '.env.example')));
   assert.ok(fs.existsSync(path.join(root, 'README.md')));
+});
+
+test('Integracion Opcion 3 (Caso Joaquin, AON): Motor de promociones y los 5 casos de prueba', () => {
+  const db = getDb({ freshMemory: true });
+  const promoRes = ejecutarCincoCasosPruebaPromociones(db);
+
+  assert.equal(promoRes.cinco_casos_prueba.length, 5);
+  // Caso 1 (Vencida) -> 0 ahorro
+  assert.equal(promoRes.cinco_casos_prueba[0].ahorro_aplicado_colones, 0);
+  // Caso 2 (Monto bajo el minimo) -> 0 ahorro
+  assert.equal(promoRes.cinco_casos_prueba[1].ahorro_aplicado_colones, 0);
+  // Caso 3 (Dos promociones en conflicto: 8% sobre 1 890 000 = 151 200 vs Bono 75 000 -> Gana 151 200)
+  assert.equal(promoRes.cinco_casos_prueba[2].promocion_aplicada.codigo_promo, 'PROMO-CPL-VOL8');
+  assert.equal(promoRes.cinco_casos_prueba[2].ahorro_aplicado_colones, 151200);
+  // Caso 4 (Categoria no aplicable) -> 0 ahorro
+  assert.equal(promoRes.cinco_casos_prueba[3].ahorro_aplicado_colones, 0);
+  // Caso 5 (Caso valido 12% sobre 73 500 = 8 820)
+  assert.equal(promoRes.cinco_casos_prueba[4].promocion_aplicada.codigo_promo, 'PROMO-NVX-HID12');
+  assert.equal(promoRes.cinco_casos_prueba[4].ahorro_aplicado_colones, 8820);
 });
 

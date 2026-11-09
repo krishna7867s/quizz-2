@@ -103,6 +103,8 @@
           <h1 class="stage-heading" id="stage-title">Resumen Ejecutivo y Estado Operativo</h1>
         </div>
         <div class="stage-actions">
+          <button type="button" id="btn-toggle-maximize" class="btn-tech">MAXIMIZAR VISTA</button>
+          <button type="button" id="btn-export-csv" class="btn-tech">EXPORTAR CSV</button>
           <button type="button" id="btn-simular-alerta" class="btn-tech btn-vermilion">SIMULAR SALIDA CRITICA (DEMO)</button>
           <button type="button" id="btn-reset-db" class="btn-tech">RESTAURAR DATOS SEMILLA</button>
         </div>
@@ -557,6 +559,7 @@
             <button type="button" class="subnav-btn active" data-sub="sub-prov-a2">01. Clasificacion de Categorias y Ahorro ERP (A2)</button>
             <button type="button" class="subnav-btn" data-sub="sub-prov-a4">02. Matriz Ponderada de Proveedores (A4)</button>
             <button type="button" class="subnav-btn" data-sub="sub-prov-comp">03. Comparador de Precios Vigentes (Opcion 1)</button>
+            <button type="button" class="subnav-btn" data-sub="sub-prov-promo">04. Motor de Promociones y 5 Casos (Opcion 3)</button>
           </div>
 
           <div id="sub-prov-a2" class="subview-pane active" data-group="prov">
@@ -650,6 +653,33 @@
                     </tr>
                   </thead>
                   <tbody id="tbody-comparador-precios"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-prov-promo" class="subview-pane" data-group="prov">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">INTEGRACION OPCION 3 // CASO JOAQUIN (AON)</span>
+                  <h2 class="panel-title">Motor de Codigos de Promocion, Auditoria de Descarte y 5 Casos de Prueba</h2>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="clean-table">
+                  <thead>
+                    <tr>
+                      <th>Caso de Prueba Evaluado</th>
+                      <th>Material / Categoria</th>
+                      <th class="num-cell">Monto Bruto</th>
+                      <th>Promocion Aplicada</th>
+                      <th class="num-cell">Ahorro</th>
+                      <th class="num-cell">Monto Neto</th>
+                      <th>Auditoria de Promociones Descartadas</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-promociones-casos"></tbody>
                 </table>
               </div>
             </div>
