@@ -1,0 +1,19 @@
+{
+  "name": "constructora-del-valle-inventario-api",
+  "version": "1.0.0",
+  "description": "Sistema de Control de Inventario, Auditoria de Gasto y Matriz de Aprobaciones — Constructora Del Valle S.A. (Quiz #2)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "db:reset": "node src/db/init.js --reset",
+    "test": "node --test tests/inventario.test.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}

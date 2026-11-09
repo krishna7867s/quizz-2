@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presentacion Ejecutiva (10 min) y Guion de Demo (5 min) — Constructora Del Valle S.A.</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    body {
+      background-color: var(--bg-carbon);
+      color: var(--ink-on-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    .deck-topbar {
+      padding: 0.75rem 1.75rem;
+      border-bottom: 1px solid var(--border-dark-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background-color: #0D0D0B;
+    }
+    .deck-stage {
+      flex: 1;
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.25rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .slide-frame {
+      display: none;
+      background-color: var(--bg-panel);
+      color: var(--ink-primary);
+      border: 2px solid var(--border-strong);
+      min-height: 620px;
+      flex-direction: column;
+      justify-content: space-between;
+      animation: slideEnter 0.5s var(--ease-out-expo) forwards;
+    }
+    .slide-frame.active {
+      display: flex;
+    }
+    @keyframes slideEnter {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.99);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .slide-header {
+      padding: 1.35rem 2rem;
+      background-color: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-strong);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .slide-body {
+      padding: 2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .slide-footer {
+      padding: 0.9rem 2rem;
+      border-top: 1px solid var(--border-hairline);
+      background-color: var(--bg-paper);
+      font-family: var(--font-mono);
+      font-size: 0.73rem;
+      color: var(--ink-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+    .deck-controls {
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border-dark-subtle);
+      background-color: #0D0D0B;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .slide-progress-track {
+      flex: 1;
+      max-width: 420px;
+      height: 6px;
+      background-color: #262622;
+      border: 1px solid #45443F;
+      margin: 0 1.5rem;
+    }
+    .slide-progress-fill {
+      height: 100%;
+      background-color: var(--accent-vermilion);
+      width: 16.6%;
+      transition: width 0.4s var(--ease-out-expo);
+    }
+  </style>
+</head>
+<body>
+  <header class="deck-topbar">
+    <div>ENTREGABLES 3 Y 4 // PRESENTACION EN CLASE (10 MIN) Y GUION DE VIDEO DEMO (5 MIN)</div>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="/" class="btn-tech" style="background: #1B1B18; color: #F4F2EC; border-color: #45443F; padding: 0.35rem 0.75rem;">IR AL DASHBOARD EN VIVO</a>
+      <a href="/informe.html" class="btn-tech" style="background: #1B1B18; color: #F4F2EC; border-color: #45443F; padding: 0.35rem 0.75rem;">VER INFORME PDF</a>
+    </div>
+  </header>
+
+  <main class="deck-stage">
+    <!-- LAMINA 1: PROBLEMA DE NEGOCIO -->
+    <section class="slide-frame active" data-slide="0">
+      <div class="slide-header">
+        <div>
+          <span class="section-code">LAMINA 01 / 06 // MINUTO 0:00 A 2:00</span>
+          <h1 style="font-family: var(--font-display); font-size: 1.65rem; display: inline; margin-left: 0.75rem;">
+            Problema de Negocio en Constructora Del Valle S.A.
+          </h1>
+        </div>
+        <span style="font-family: var(--font-mono); font-size: 0.78rem;">DIAGNOSTICO OPERATIVO Y FINANCIERO</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3col" style="border: 1px solid var(--border-strong); margin-bottom: 1.5rem;">
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">PROBLEMA 01 // CATALOGO CAOTICO</div>
+            <h3 style="font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.45rem;">Compras descentralizadas sin SKU</h3>
+            <p style="font-size: 0.86rem; line-height: 1.6; color: var(--ink-secondary);">
+              Obras, Mantenimiento y Bodega Central compran por separado el mismo insumo bajo nombres distintos (<code>"Cemento gris 50 kg"</code>, <code>"Saco cemento uso general"</code>, <code>"CEM-GRIS-50"</code>), perdiendo poder de negociacion por volumen y pagando hasta un 20.9% de sobreprecio.
+            </p>
+          </div>
+          <div class="grid-pane" style="background-color: var(--accent-vermilion-bg);">
+            <div class="code-pill" style="margin-bottom: 0.5rem; border-color: var(--accent-vermilion); color: var(--accent-vermilion);">PROBLEMA 02 // FUGA DE VALOR</div>
+            <h3 style="font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.45rem;">₡1 483 000/mes en duplicados y sobreprecios</h3>
+            <p style="font-size: 0.86rem; line-height: 1.6; color: var(--ink-secondary);">
+              En octubre se emitieron ordenes duplicadas exactas (<code>OC-1041</code> y <code>OC-1042</code> por ₡1 290 000), ordenes fraccionadas para evadir a Gerencia Financiera (<code>OC-1050</code> y <code>OC-1053</code> = ₡2 107 000) y compras fuera del contrato marco del Proveedor A.
+            </p>
+          </div>
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">PROBLEMA 03 // RIESGO DE PARO DE OBRA</div>
+            <h3 style="font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.45rem;">Reposicion reactiva sin Punto de Reorden</h3>
+            <p style="font-size: 0.86rem; line-height: 1.6; color: var(--ink-secondary);">
+              La Arena (14 m3 vs PR de 20 m3) y el Block 12x20x40 (2 800 unid. vs PR de 3 600 unid.) operan hoy debajo de su umbral de reposicion, consumiendo hasta el 75% de su stock de seguridad sin alertas automaticas ni trazabilidad por lote.
+            </p>
+          </div>
+        </div>
+        <div style="border: 1px solid var(--border-strong); padding: 1.1rem 1.35rem; background-color: var(--bg-paper); display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--font-mono); font-size: 0.82rem; font-weight: 600;">IMPACTO FINANCIERO ANUALIZADO SI NO SE INTERVIENE:</span>
+          <span style="font-family: var(--font-mono); font-size: 1.55rem; font-weight: 700; color: var(--accent-vermilion);">₡17 796 000 / ANO (HASTA ₡29 604 000 / ANO)</span>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>CONSTRUCTORA DEL VALLE S.A. // QUIZ #2</span>
+        <span>USE LAS FLECHAS DEL TECLADO [&larr; / &rarr;] PARA AVANZAR</span>
+      </div>
+    </section>
+
+    <!-- LAMINA 2: HALLAZGOS PARTE A (A1, A2, A3) -->
+    <section class="slide-frame" data-slide="1">
+      <div class="slide-header">
+        <div>
+          <span class="section-code">LAMINA 02 / 06 // MINUTO 2:00 A 4:00</span>
+          <h1 style="font-family: var(--font-display); font-size: 1.65rem; display: inline; margin-left: 0.75rem;">
+            Sintesis Analitica Parte A: Circuito, Taxonomia y Auditoria de Octubre
+          </h1>
+        </div>
+        <span style="font-family: var(--font-mono); font-size: 0.78rem;">EJERCICIOS A1, A2 Y A3</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2col-equal" style="border: 1px solid var(--border-strong);">
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">A1 + A2 // GOBERNANZA Y CATALOGO MAESTRO</div>
+            <ul style="padding-left: 1.2rem; font-size: 0.86rem; line-height: 1.7; color: var(--ink-primary);">
+              <li><strong>Circuito de 6 etapas con Three-Way Match:</strong> Cruce obligatorio entre Orden de Compra (precio), Recepcion Ciega (cantidad fisica en Kardex) y Factura Electronica antes del pago.</li>
+              <li><strong>Control Antifraccionamiento (Ventana Movil 30d):</strong> Suma las ordenes por area y proveedor para evitar que pedidos divididos evadan a la Gerencia Financiera.</li>
+              <li><strong>Taxonomia de 2 niveles y ahorro A2:</strong> Homologar Cemento (<code>MAT-CEM-001</code>) ahorra <strong>₡62 000</strong> y Varilla #3 / Hierro 3/8 (<code>MAT-ACE-003</code>) ahorra <strong>₡27 000</strong> (Total: <strong>₡89 000</strong>; o <strong>₡117 000</strong> con guantes EPP).</li>
+            </ul>
+          </div>
+          <div class="grid-pane" style="background-color: var(--bg-paper);">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">A3 // DESGLOSE EXACTO DE FUGA DE VALOR (OCTUBRE)</div>
+            <table class="tech-table">
+              <thead>
+                <tr>
+                  <th>Concepto Auditado</th>
+                  <th class="num-col">Mensual</th>
+                  <th class="num-col">Proyeccion Anual</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sobreprecio puro frente a contrato (6 OCs)</td>
+                  <td class="num-col">₡223 000</td>
+                  <td class="num-col">₡2 676 000</td>
+                </tr>
+                <tr class="row-critical">
+                  <td><strong>Sobreprecios + Duplicado Exacto (OC-1042)</strong></td>
+                  <td class="num-col"><strong>₡1 483 000</strong></td>
+                  <td class="num-col"><strong>₡17 796 000</strong></td>
+                </tr>
+                <tr>
+                  <td>Escenario Maximo (+ OC-1053 duplicada)</td>
+                  <td class="num-col">₡2 467 000</td>
+                  <td class="num-col">₡29 604 000</td>
+                </tr>
+                <tr>
+                  <td>Gasto bruto fuera de contrato (Prov. B, C, D)</td>
+                  <td class="num-col">₡2 547 000</td>
+                  <td class="num-col">₡30 564 000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>CONSTRUCTORA DEL VALLE S.A. // PARTE A</span>
+        <span>LAMINA 02 DE 06</span>
+      </div>
+    </section>
+
+    <!-- LAMINA 3: PROVEEDORES (A4) Y PUNTO DE REORDEN (A5) -->
+    <section class="slide-frame" data-slide="2">
+      <div class="slide-header">
+        <div>
+          <span class="section-code">LAMINA 03 / 06 // MINUTO 4:00 A 6:00</span>
+          <h1 style="font-family: var(--font-display); font-size: 1.65rem; display: inline; margin-left: 0.75rem;">
+            Estrategia Dual Sourcing (A4) y Calculo de Punto de Reorden (A5)
+          </h1>
+        </div>
+        <span style="font-family: var(--font-mono); font-size: 0.78rem;">EJERCICIOS A4 Y A5</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2col-equal" style="border: 1px solid var(--border-strong);">
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">A4 // MATRIZ PONDERADA DE PROVEEDORES</div>
+            <p style="font-size: 0.85rem; line-height: 1.55; margin-bottom: 0.85rem;">
+              Evaluacion sobre 6 criterios (Precio 25%, Calidad 20%, Plazo OTIF 20%, Credito 15%, Posventa 10%, Cobertura/Riesgo 10%):
+            </p>
+            <div style="font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.8;">
+              1. <strong>Construplaza (Proveedor A):</strong> 4.60 / 5.00 pts (92%) &rarr; <strong>80% del volumen</strong><br/>
+              2. <strong>Novex (Respaldo Tecnico):</strong> 4.40 / 5.00 pts (88%) &rarr; <strong>20% del volumen</strong><br/>
+              3. <strong>EPA (Ferreteria Retail):</strong> 3.10 / 5.00 pts (62%) &rarr; <strong>Descartado por precio</strong>
+            </div>
+          </div>
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">A5 // RESULTADOS EXACTOS DE SS Y PR</div>
+            <table class="tech-table">
+              <thead>
+                <tr>
+                  <th>Material</th>
+                  <th class="num-col">SS</th>
+                  <th class="num-col">PR</th>
+                  <th class="num-col">Stock</th>
+                  <th>Prioridad</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="row-critical">
+                  <td><strong>Arena (m3)</strong></td>
+                  <td class="num-col">8</td>
+                  <td class="num-col">20</td>
+                  <td class="num-col">14</td>
+                  <td><strong>#1 Reponer Hoy (70% PR)</strong></td>
+                </tr>
+                <tr class="row-critical">
+                  <td><strong>Block 12x20x40</strong></td>
+                  <td class="num-col">1 200</td>
+                  <td class="num-col">3 600</td>
+                  <td class="num-col">2 800</td>
+                  <td><strong>#2 Reponer Hoy (77.8% PR)</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Varilla #3</strong></td>
+                  <td class="num-col">200</td>
+                  <td class="num-col">800</td>
+                  <td class="num-col">850</td>
+                  <td>#3 Preventiva (+50 unid.)</td>
+                </tr>
+                <tr>
+                  <td><strong>Cemento 50 kg</strong></td>
+                  <td class="num-col">45</td>
+                  <td class="num-col">165</td>
+                  <td class="num-col">190</td>
+                  <td>#4 Monitoreo (+25 sacos)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>CONSTRUCTORA DEL VALLE S.A. // EJERCICIOS A4 Y A5</span>
+        <span>LAMINA 03 DE 06</span>
+      </div>
+    </section>
+
+    <!-- LAMINA 4: ARQUITECTURA TECNICA PARTE B -->
+    <section class="slide-frame" data-slide="3">
+      <div class="slide-header">
+        <div>
+          <span class="section-code">LAMINA 04 / 06 // MINUTO 6:00 A 7:30</span>
+          <h1 style="font-family: var(--font-display); font-size: 1.65rem; display: inline; margin-left: 0.75rem;">
+            Arquitectura de la Solucion: Node.js + SQLite 3FN + Integraciones
+          </h1>
+        </div>
+        <span style="font-family: var(--font-mono); font-size: 0.78rem;">PARTE B + PUNTOS EXTRA</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3col" style="border: 1px solid var(--border-strong);">
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">CAPA DE DATOS (SQLITE 3FN)</div>
+            <p style="font-size: 0.85rem; line-height: 1.6; color: var(--ink-secondary);">
+              9 tablas relacionales con integridad referencial (<code>PRAGMA foreign_keys = ON</code>): <code>materiales</code>, <code>stock_ubicacion</code>, <code>movimientos_inventario</code>, <code>ordenes_compra</code>, <code>proveedores</code>, <code>matriz_aprobacion</code>, <code>alertas</code>, <code>equivalencias_proveedor</code> e <code>historico_precios_proveedor</code>.
+            </p>
+          </div>
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">SERVICIOS DE DOMINIO NODE.JS</div>
+            <p style="font-size: 0.85rem; line-height: 1.6; color: var(--ink-secondary);">
+              • <code>reorden.js</code>: Calcula <code>SS</code> y <code>PR</code> al vuelo, valida stock por bodega en transacciones <code>BEGIN/COMMIT</code> y dispara alertas.<br/>
+              • <code>duplicados.js</code>: Escanea pares sospechosos y cuantifica sobreprecios.<br/>
+              • <code>aprobaciones.js</code>: Aplica la Matriz A1 con acumulado de 30 dias.
+            </p>
+          </div>
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">TODOS LOS PUNTOS EXTRA</div>
+            <p style="font-size: 0.85rem; line-height: 1.6; color: var(--ink-secondary);">
+              1. Dashboard interactivo conectado a la API.<br/>
+              2. Integracion Opcion 2 (Inventario) + Opcion 1 (Comparador de precios).<br/>
+              3. Matriz de aprobacion A1 activa en el sistema.<br/>
+              4. Suite de pruebas automatizadas (<code>npm test</code>) + Workflow n8n exportado.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>CONSTRUCTORA DEL VALLE S.A. // ARQUITECTURA DE SOFTWARE</span>
+        <span>LAMINA 04 DE 06</span>
+      </div>
+    </section>
+
+    <!-- LAMINA 5: GUION PASO A PASO PARA EL VIDEO DEMO DE 5 MINUTOS -->
+    <section class="slide-frame" data-slide="4">
+      <div class="slide-header">
+        <div>
+          <span class="section-code">LAMINA 05 / 06 // GUION VIDEO DEMO (MAX 5 MIN)</span>
+          <h1 style="font-family: var(--font-display); font-size: 1.65rem; display: inline; margin-left: 0.75rem;">
+            Secuencia Recomendada para la Demo en Vivo y Grabacion del Video
+          </h1>
+        </div>
+        <span style="font-family: var(--font-mono); font-size: 0.78rem;">ENTREGABLE 3</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2col-equal" style="border: 1px solid var(--border-strong);">
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.45rem;">PASO 1 (0:00 - 1:30) // STOCK Y ALERTA EN VIVO</div>
+            <p style="font-size: 0.84rem; line-height: 1.55; margin-bottom: 0.9rem;">
+              Mostrar en el <strong>Modulo 01</strong> que Arena (14 vs PR 20) y Block (2 800 vs PR 3 600) estan en prioridad critica, mientras Cemento tiene 190 sacos (PR = 165). Hacer clic en el boton rojo <code>SIMULAR SALIDA CRITICA</code>: el stock de Cemento baja a 155 sacos y el sistema genera la alerta <code>ALT-PR-006</code> en vivo.
+            </p>
+            <div class="code-pill" style="margin-bottom: 0.45rem;">PASO 2 (1:30 - 3:00) // TRAZABILIDAD E INTEGRACION</div>
+            <p style="font-size: 0.84rem; line-height: 1.55;">
+              Abrir el boton <code>TRAZABILIDAD</code> en Cemento para mostrar el Kardex completo con lote y OC de origen. Luego pulsar <code>GENERAR REQUISICION / OC CON PROVEEDOR MAS BARATO</code> para que el comparador sugiera Construplaza y cree la orden automaticamente.
+            </p>
+          </div>
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.45rem;">PASO 3 (3:00 - 4:15) // ESCANEO DE DUPLICADOS (A3)</div>
+            <p style="font-size: 0.84rem; line-height: 1.55; margin-bottom: 0.9rem;">
+              Ir al <strong>Modulo 02</strong> y mostrar como el algoritmo detecta <code>OC-1041</code>/<code>OC-1042</code> (duplicado exacto de ₡1 290 000) y <code>OC-1050</code>/<code>OC-1053</code> (fraccionamiento de ₡2 107 000). Ajustar la ventana de dias y pulsar <code>EJECUTAR ESCANEO</code>.
+            </p>
+            <div class="code-pill" style="margin-bottom: 0.45rem;">PASO 4 (4:15 - 5:00) // MATRIZ A1 Y PRUEBAS</div>
+            <p style="font-size: 0.84rem; line-height: 1.55;">
+              En el <strong>Modulo 03</strong>, intentar aprobar <code>OC-1085</code> (₡2 425 000) con el rol de Jefatura de Area (el sistema lo bloquea por segregacion de funciones) y luego aprobarla con Gerencia Financiera.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>CONSTRUCTORA DEL VALLE S.A. // GUION DE DEMOSTRACION</span>
+        <span>LAMINA 05 DE 06</span>
+      </div>
+    </section>
+
+    <!-- LAMINA 6: APRENDIZAJES Y CONCLUSIONES -->
+    <section class="slide-frame" data-slide="5">
+      <div class="slide-header">
+        <div>
+          <span class="section-code">LAMINA 06 / 06 // MINUTO 8:30 A 10:00</span>
+          <h1 style="font-family: var(--font-display); font-size: 1.65rem; display: inline; margin-left: 0.75rem;">
+            Aprendizajes Clave de Negocio e Ingenieria
+          </h1>
+        </div>
+        <span style="font-family: var(--font-mono); font-size: 0.78rem;">CIERRE DE EXPOSICION</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3col" style="border: 1px solid var(--border-strong);">
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">01 // DATO MAESTRO COMO BASE</div>
+            <h3 style="font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 0.45rem;">Sin taxonomia no hay negociacion</h3>
+            <p style="font-size: 0.85rem; line-height: 1.6; color: var(--ink-secondary);">
+              Unificar descripciones libres en un SKU estandar es el requisito previo para detectar sobreprecios, consolidar volumen en contratos marco y automatizar alertas de duplicidad.
+            </p>
+          </div>
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">02 // CONTROLES EN CODIGO</div>
+            <h3 style="font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 0.45rem;">Reglas preventivas vs. auditoria tardia</h3>
+            <p style="font-size: 0.85rem; line-height: 1.6; color: var(--ink-secondary);">
+              Descubrir una orden duplicada o fraccionada semanas despues en contabilidad es costoso; programar la ventana movil de 30 dias y el filtro de duplicidad en la API evita la fuga antes de comprometer fondos.
+            </p>
+          </div>
+          <div class="grid-pane">
+            <div class="code-pill" style="margin-bottom: 0.5rem;">03 // KARDEX EN TIEMPO REAL</div>
+            <h3 style="font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 0.45rem;">Del conteo aislado a la trazabilidad total</h3>
+            <p style="font-size: 0.85rem; line-height: 1.6; color: var(--ink-secondary);">
+              Derivar el stock actual exclusivamente de los movimientos documentados (OC, recepcion ciega, traslado, vale de obra) garantiza que el Punto de Reorden refleje siempre la realidad fisica en patio.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>CONSTRUCTORA DEL VALLE S.A. // CONCLUSIONES</span>
+        <span>FIN DE LA PRESENTACION</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="deck-controls">
+    <button type="button" id="btn-prev-slide" class="btn-tech" style="background: #1B1B18; color: #F4F2EC; border-color: #45443F;">&larr; ANTERIOR</button>
+    <div class="slide-progress-track">
+      <div id="slide-progress-bar" class="slide-progress-fill"></div>
+    </div>
+    <button type="button" id="btn-next-slide" class="btn-tech btn-vermilion">SIGUIENTE LAMINA &rarr;</button>
+  </footer>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide-frame'));
+    const bar = document.getElementById('slide-progress-bar');
+    let current = 0;
+
+    function showSlide(idx) {
+      current = (idx + slides.length) % slides.length;
+      slides.forEach((s, i) => s.classList.toggle('active', i === current));
+      bar.style.width = `${((current + 1) / slides.length) * 100}%`;
+    }
+
+    document.getElementById('btn-prev-slide').addEventListener('click', () => showSlide(current - 1));
+    document.getElementById('btn-next-slide').addEventListener('click', () => showSlide(current + 1));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') showSlide(current + 1);
+      if (e.key === 'ArrowLeft') showSlide(current - 1);
+    });
+  </script>
+</body>
+</html>

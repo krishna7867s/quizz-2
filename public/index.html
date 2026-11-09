@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Constructora Del Valle S.A. — Control de Inventarios y Auditoria de Compras</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- =====================================================================
+         BARRA LATERAL DE NAVEGACION (ARQUITECTURA LIMPIA Y DESPEJADA)
+         ===================================================================== -->
+    <aside class="app-sidebar">
+      <div>
+        <div class="sidebar-brand">
+          <div class="sidebar-tag">
+            <span class="status-dot"></span> SISTEMA ERP / KARDEX
+          </div>
+          <div class="sidebar-company">CONSTRUCTORA DEL VALLE S.A.</div>
+          <div class="sidebar-sub">Control de Inventario y Compras</div>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Navegacion principal">
+          <div class="sidebar-section-label">OPERACION E INVENTARIO</div>
+
+          <button type="button" class="nav-item active" data-page="page-resumen" data-bc="MODULO 01 // PANEL GENERAL" data-title="Resumen Ejecutivo y Estado Operativo">
+            <span class="nav-item-left">
+              <span class="nav-num">01</span>
+              <span class="nav-title">Resumen Ejecutivo</span>
+            </span>
+            <span class="nav-pill">KPIs</span>
+          </button>
+
+          <button type="button" class="nav-item" data-page="page-inventario" data-bc="MODULO 02 // EJERCICIO A5 + PARTE B" data-title="Niveles de Stock y Punto de Reorden (PR)">
+            <span class="nav-item-left">
+              <span class="nav-num">02</span>
+              <span class="nav-title">Stock y Reorden</span>
+            </span>
+            <span class="nav-pill">A5</span>
+          </button>
+
+          <button type="button" class="nav-item" data-page="page-kardex" data-bc="MODULO 03 // TRAZABILIDAD DE EXISTENCIAS" data-title="Kardex de Movimientos y Registro">
+            <span class="nav-item-left">
+              <span class="nav-num">03</span>
+              <span class="nav-title">Movimientos Kardex</span>
+            </span>
+            <span class="nav-pill">POST</span>
+          </button>
+
+          <div class="sidebar-section-label">AUDITORIA Y ABASTECIMIENTO</div>
+
+          <button type="button" class="nav-item" data-page="page-auditoria" data-bc="MODULO 04 // EJERCICIO A3 + PARTE B" data-title="Compras Duplicadas y Fuga de Valor">
+            <span class="nav-item-left">
+              <span class="nav-num">04</span>
+              <span class="nav-title">Duplicados y Fugas</span>
+            </span>
+            <span class="nav-pill">A3</span>
+          </button>
+
+          <button type="button" class="nav-item" data-page="page-circuito" data-bc="MODULO 05 // EJERCICIO A1 + WORKFLOW" data-title="Circuito de Compra y Matriz de Aprobacion">
+            <span class="nav-item-left">
+              <span class="nav-num">05</span>
+              <span class="nav-title">Circuito y Aprobaciones</span>
+            </span>
+            <span class="nav-pill">A1</span>
+          </button>
+
+          <button type="button" class="nav-item" data-page="page-proveedores" data-bc="MODULO 06 // EJERCICIOS A2, A4 Y OPCION 1" data-title="Taxonomia ERP, Proveedores y Comparador">
+            <span class="nav-item-left">
+              <span class="nav-num">06</span>
+              <span class="nav-title">Taxonomia y Proveedores</span>
+            </span>
+            <span class="nav-pill">A2/A4</span>
+          </button>
+
+          <div class="sidebar-section-label">INGENIERIA DE DATOS</div>
+
+          <button type="button" class="nav-item" data-page="page-arquitectura" data-bc="MODULO 07 // MODELO ER + API REST" data-title="Modelo Entidad-Relacion y Consola API">
+            <span class="nav-item-left">
+              <span class="nav-num">07</span>
+              <span class="nav-title">Modelo ER y API</span>
+            </span>
+            <span class="nav-pill">SQL</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="/presentacion.html" target="_blank" class="btn-tech btn-sidebar">MODO PRESENTACION (10 MIN)</a>
+        <a href="/informe.html" target="_blank" class="btn-tech btn-sidebar">ABRIR INFORME ESCRITO (PDF)</a>
+      </div>
+    </aside>
+
+    <!-- =====================================================================
+         ESCENARIO PRINCIPAL (UNA SOLA TAREA ENFOCADA POR PANTALLA)
+         ===================================================================== -->
+    <div class="app-main">
+      <header class="stage-topbar">
+        <div>
+          <div class="stage-breadcrumb" id="stage-bc">MODULO 01 // PANEL GENERAL</div>
+          <h1 class="stage-heading" id="stage-title">Resumen Ejecutivo y Estado Operativo</h1>
+        </div>
+        <div class="stage-actions">
+          <button type="button" id="btn-simular-alerta" class="btn-tech btn-vermilion">SIMULAR SALIDA CRITICA (DEMO)</button>
+          <button type="button" id="btn-reset-db" class="btn-tech">RESTAURAR DATOS SEMILLA</button>
+        </div>
+      </header>
+
+      <main class="stage-content">
+
+        <!-- =================================================================
+             PAGINA 01: RESUMEN EJECUTIVO (LIMPIO Y DESPEJADO)
+             ================================================================= -->
+        <section id="page-resumen" class="view-page active">
+          <div class="metric-grid-4">
+            <div class="metric-card">
+              <div class="metric-overline">01 / VALOR INVENTARIO ACTIVO</div>
+              <div class="metric-number" id="kpi-valor-inventario">₡0</div>
+              <div class="metric-caption">Existencias valorizadas en Bodega Central, Obras y Mantenimiento</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-overline">02 / MATERIALES BAJO REORDEN</div>
+              <div class="metric-number" id="kpi-bajo-pr" style="color: var(--vermilion);">0 MATERIALES</div>
+              <div class="metric-caption">Prioridad inmediata hoy: Arena (14 m3) y Block (2 800 unid.)</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-overline">03 / FUGA MENSUAL OCTUBRE (A3)</div>
+              <div class="metric-number" id="kpi-fuga-mensual" style="color: var(--vermilion);">₡0</div>
+              <div class="metric-caption">₡223 000 sobreprecio + ₡1 290 000 orden duplicada OC-1042</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-overline">04 / PROYECCION ANUAL FUGA</div>
+              <div class="metric-number" id="kpi-fuga-anual" style="color: var(--amber);">₡0</div>
+              <div class="metric-caption">Ahorro inmediato en reclasificacion A2: <strong id="kpi-ahorro-a2">₡89 000</strong></div>
+            </div>
+          </div>
+
+          <div class="split-2col">
+            <div class="panel-box" style="margin-bottom: 0;">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">EJERCICIO A5</span>
+                  <h2 class="panel-title">Estado de Materiales Principales y Prioridad</h2>
+                </div>
+                <button type="button" class="btn-tech btn-ir-modulo" data-target="page-inventario">VER TABLA COMPLETA</button>
+              </div>
+              <div class="panel-body" id="resumen-materiales-cards"></div>
+            </div>
+
+            <div class="panel-box" style="margin-bottom: 0;">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">CONTROL ACTIVO</span>
+                  <h2 class="panel-title">Alertas Prioritarias del Sistema</h2>
+                </div>
+              </div>
+              <div class="panel-body" id="contenedor-alertas-activas"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================
+             PAGINA 02: STOCK Y PUNTO DE REORDEN (SUB-NAVEGACION LIMPIA)
+             ================================================================= -->
+        <section id="page-inventario" class="view-page">
+          <div class="subnav-bar" data-group="inv">
+            <button type="button" class="subnav-btn active" data-sub="sub-inv-tabla">01. Niveles de Stock y Punto de Reorden</button>
+            <button type="button" class="subnav-btn" data-sub="sub-inv-curva">02. Simulador Vectorial de Agotamiento (PR y SS)</button>
+          </div>
+
+          <div id="sub-inv-tabla" class="subview-pane active" data-group="inv">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">PR = (d × L) + SS</span>
+                  <h2 class="panel-title">Matriz de Niveles de Stock, Stock de Seguridad y Orden de Prioridad</h2>
+                </div>
+                <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-secondary);">
+                  SS = (d_max − d_prom) × L &nbsp;|&nbsp; Calculado en vivo por el servidor
+                </span>
+              </div>
+              <div class="table-wrap">
+                <table class="clean-table">
+                  <thead>
+                    <tr>
+                      <th>Prioridad</th>
+                      <th>Material y SKU</th>
+                      <th class="num-cell">Demanda (d / Max)</th>
+                      <th class="num-cell">Entrega (L)</th>
+                      <th class="num-cell">Stock Seg. (SS)</th>
+                      <th class="num-cell">Punto Reorden (PR)</th>
+                      <th class="num-cell">Stock Actual</th>
+                      <th>Cobertura frente al PR</th>
+                      <th>Estado</th>
+                      <th>Accion</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-materiales"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-inv-curva" class="subview-pane" data-group="inv">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">PROYECCION TEMPORAL</span>
+                  <h2 class="panel-title">Curva de Agotamiento Diario y Generacion Automatica de Orden</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <label class="field-label" for="sel-curva-material">Seleccionar Material:</label>
+                  <select id="sel-curva-material" class="field-select" style="padding: 0.45rem 0.75rem;"></select>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="split-2col">
+                  <div id="contenedor-svg-curva" style="border: 1px solid var(--line-subtle); padding: 1.25rem; background: var(--bg-canvas);"></div>
+                  <div id="contenedor-metricas-curva"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================
+             PAGINA 03: KARDEX Y REGISTRO DE MOVIMIENTOS
+             ================================================================= -->
+        <section id="page-kardex" class="view-page">
+          <div class="subnav-bar" data-group="kardex">
+            <button type="button" class="subnav-btn active" data-sub="sub-kardex-historial">01. Bitacora General de Movimientos Kardex</button>
+            <button type="button" class="subnav-btn" data-sub="sub-kardex-nuevo">02. Registrar Entrada, Salida o Traslado</button>
+          </div>
+
+          <div id="sub-kardex-historial" class="subview-pane active" data-group="kardex">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">TRAZABILIDAD COMPLETA</span>
+                  <h2 class="panel-title">Historial de Movimientos (Entradas, Salidas y Traslados entre Obras)</h2>
+                </div>
+                <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-muted);">
+                  Haga clic en "Trazabilidad" en cualquier material para filtrar su cadena completa de lotes y OCs
+                </span>
+              </div>
+              <div class="table-wrap">
+                <table class="clean-table">
+                  <thead>
+                    <tr>
+                      <th>Codigo</th>
+                      <th>Fecha y Hora</th>
+                      <th>Tipo</th>
+                      <th>Material</th>
+                      <th class="num-cell">Cantidad</th>
+                      <th>Origen &rarr; Destino</th>
+                      <th>Documento / OC</th>
+                      <th>Lote / Serie</th>
+                      <th>Responsable</th>
+                      <th class="num-cell">Saldo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-ultimos-movimientos"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-kardex-nuevo" class="subview-pane" data-group="kardex">
+            <div class="panel-box" style="max-width: 860px;">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">POST /movimientos</span>
+                  <h2 class="panel-title">Registrar Nuevo Movimiento con Recalculo Automatico de Stock y PR</h2>
+                </div>
+              </div>
+              <div class="panel-body">
+                <form id="form-movimiento" class="clean-form-grid">
+                  <div class="field-group">
+                    <label class="field-label" for="mov-tipo">Tipo de Movimiento</label>
+                    <select id="mov-tipo" class="field-select" required>
+                      <option value="SALIDA">SALIDA (Consumo en Obra / Mantenimiento)</option>
+                      <option value="ENTRADA">ENTRADA (Recepcion de Orden de Compra)</option>
+                      <option value="TRASLADO">TRASLADO (Entre Bodega Central y Obra)</option>
+                      <option value="AJUSTE">AJUSTE (Auditoria Fisica de Inventario)</option>
+                    </select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="mov-material">Material Normalizado</label>
+                    <select id="mov-material" class="field-select" required></select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="mov-cantidad">Cantidad Fisica</label>
+                    <input type="number" id="mov-cantidad" class="field-input" min="1" step="0.5" value="35" required />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="mov-doc">Documento de Origen (OC / Recepcion / Vale)</label>
+                    <input type="text" id="mov-doc" class="field-input" value="VALE-OBR-940" required />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="mov-origen">Ubicacion Origen</label>
+                    <select id="mov-origen" class="field-select"></select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="mov-destino">Ubicacion Destino</label>
+                    <select id="mov-destino" class="field-select"></select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="mov-lote">Lote / Colada / Serie</label>
+                    <input type="text" id="mov-lote" class="field-input" value="LOTE-CEM-1126A" required />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label" for="mov-usuario">Responsable que Ejecuta</label>
+                    <input type="text" id="mov-usuario" class="field-input" value="Ing. Valeria Fonseca" required />
+                  </div>
+                  <div class="field-group full">
+                    <label class="field-label" for="mov-obs">Observaciones Tecnicas / Elemento Constructivo</label>
+                    <input type="text" id="mov-obs" class="field-input" value="Fundicion de elementos verticales bloque C" />
+                  </div>
+                  <div class="field-group full" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding-top: 0.5rem;">
+                    <span style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-muted);">
+                      Si el saldo resultante cae bajo el PR, el servidor registra alerta critica automaticamente.
+                    </span>
+                    <button type="submit" class="btn-tech btn-primary">REGISTRAR MOVIMIENTO EN KARDEX</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================
+             PAGINA 04: AUDITORIA DE GASTO Y DUPLICADOS (EJERCICIO A3)
+             ================================================================= -->
+        <section id="page-auditoria" class="view-page">
+          <div class="subnav-bar" data-group="aud">
+            <button type="button" class="subnav-btn active" data-sub="sub-aud-duplicados">01. Compras Duplicadas y Escenarios de Fuga</button>
+            <button type="button" class="subnav-btn" data-sub="sub-aud-tabla">02. Extracto de Ordenes de Octubre y Controles</button>
+          </div>
+
+          <div id="sub-aud-duplicados" class="subview-pane active" data-group="aud">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">GET /ordenes/posibles-duplicados</span>
+                  <h2 class="panel-title">Deteccion Parametrica de Compras Duplicadas y Fraccionamiento</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                  <label class="field-label" for="filtro-ventana-dias">Ventana (dias):</label>
+                  <input type="number" id="filtro-ventana-dias" class="field-input" value="3" min="0" max="30" style="width: 70px; padding: 0.4rem;" />
+                  <label class="field-label" for="filtro-tolerancia-pct">Tolerancia Cant. (%):</label>
+                  <input type="number" id="filtro-tolerancia-pct" class="field-input" value="10" min="0" max="50" style="width: 70px; padding: 0.4rem;" />
+                  <button type="button" id="btn-recalcular-duplicados" class="btn-tech btn-primary">ESCANEAR</button>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div id="contenedor-pares-duplicados" class="split-2col-equal" style="margin-bottom: 2rem;"></div>
+                <div id="panel-escenarios-fuga" class="split-3col"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-aud-tabla" class="subview-pane" data-group="aud">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">AUDITORIA LINEA POR LINEA</span>
+                  <h2 class="panel-title">Comparativa frente a Contrato Marco Vigente (Cemento ₡6 300 | Varilla ₡2 050)</h2>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="clean-table">
+                  <thead>
+                    <tr>
+                      <th>N° OC</th>
+                      <th>Fecha</th>
+                      <th>Area</th>
+                      <th>Proveedor</th>
+                      <th>Articulo</th>
+                      <th class="num-cell">Cant.</th>
+                      <th class="num-cell">Precio OC</th>
+                      <th class="num-cell">Contrato</th>
+                      <th class="num-cell">Total OC</th>
+                      <th class="num-cell">Sobreprecio</th>
+                      <th>Diagnostico</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-ordenes-auditoria"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="split-3col">
+              <div class="panel-box" style="margin-bottom: 0; padding: 1.5rem;">
+                <span class="sku-tag" style="margin-bottom: 0.65rem;">CONTROL 01 // CATALOGO CERRADO</span>
+                <h3 style="font-family: var(--font-display); font-size: 1.05rem; margin-bottom: 0.5rem;">Bloqueo de Tarifa de Contrato</h3>
+                <p style="font-size: 0.84rem; color: var(--ink-secondary); line-height: 1.6;">
+                  El ERP bloquea el campo de precio unitario en articulos con contrato activo (₡6 300 cemento y ₡2 050 varilla) e impide adjudicar a proveedores no homologados sin firma de Gerencia Financiera.
+                </p>
+              </div>
+              <div class="panel-box" style="margin-bottom: 0; padding: 1.5rem;">
+                <span class="sku-tag" style="margin-bottom: 0.65rem;">CONTROL 02 // FILTRO DE DUPLICIDAD</span>
+                <h3 style="font-family: var(--font-display); font-size: 1.05rem; margin-bottom: 0.5rem;">Huella Proveedor + SKU + Ventana</h3>
+                <p style="font-size: 0.84rem; color: var(--ink-secondary); line-height: 1.6;">
+                  Rechaza preventivamente cualquier orden que coincida en proveedor, material y cantidad (±10%) dentro de 72 horas, deteniendo casos como <code>OC-1042</code> y <code>OC-1053</code>.
+                </p>
+              </div>
+              <div class="panel-box" style="margin-bottom: 0; padding: 1.5rem;">
+                <span class="sku-tag" style="margin-bottom: 0.65rem;">CONTROL 03 // ACUMULADO 30 DIAS</span>
+                <h3 style="font-family: var(--font-display); font-size: 1.05rem; margin-bottom: 0.5rem;">Antifraccionamiento + 3-Way Match</h3>
+                <p style="font-size: 0.84rem; color: var(--ink-secondary); line-height: 1.6;">
+                  Evalua los umbrales de aprobacion sobre el gasto acumulado movil de 30 dias y exige cruce exacto entre OC, Recepcion Ciega y Factura antes del pago.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================
+             PAGINA 05: CIRCUITO DE COMPRA Y APROBACIONES (EJERCICIO A1)
+             ================================================================= -->
+        <section id="page-circuito" class="view-page">
+          <div class="subnav-bar" data-group="cir">
+            <button type="button" class="subnav-btn active" data-sub="sub-cir-diagrama">01. Circuito de Compra y Three-Way Match (A1.a)</button>
+            <button type="button" class="subnav-btn" data-sub="sub-cir-matriz">02. Matriz de Aprobacion y Firma de Ordenes (A1.b)</button>
+          </div>
+
+          <div id="sub-cir-diagrama" class="subview-pane active" data-group="cir">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">EJERCICIO A1.a</span>
+                  <h2 class="panel-title">Circuito Completo de una Compra (Seleccione cada etapa para inspeccionar)</h2>
+                </div>
+              </div>
+              <div class="steps-grid" id="circuit-nodes-container"></div>
+              <div class="panel-body">
+                <div class="split-2col" id="circuit-detail-panel"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-cir-matriz" class="subview-pane" data-group="cir">
+            <div class="split-2col">
+              <div class="panel-box" style="margin-bottom: 0;">
+                <div class="panel-header">
+                  <div class="panel-title-wrap">
+                    <span class="panel-tag">EJERCICIO A1.b</span>
+                    <h2 class="panel-title">Matriz de Aprobacion Mejorada</h2>
+                  </div>
+                </div>
+                <div class="table-wrap">
+                  <table class="clean-table">
+                    <thead>
+                      <tr>
+                        <th>Monto de Compra</th>
+                        <th>Rol que Aprueba</th>
+                        <th class="num-cell">Cotizaciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="num-cell">Hasta ₡250 000</td>
+                        <td><strong>Jefatura del Area Solicitante</strong></td>
+                        <td class="num-cell">1</td>
+                      </tr>
+                      <tr>
+                        <td class="num-cell">₡250 001 a ₡2 000 000</td>
+                        <td><strong>Jefatura de Compras</strong></td>
+                        <td class="num-cell">2</td>
+                      </tr>
+                      <tr>
+                        <td class="num-cell">₡2 000 001 a ₡10 000 000</td>
+                        <td><strong>Gerencia Financiera</strong></td>
+                        <td class="num-cell">3</td>
+                      </tr>
+                      <tr>
+                        <td class="num-cell">Mas de ₡10 000 000</td>
+                        <td><strong>Gerencia General + Comite</strong></td>
+                        <td class="num-cell">3 + Comite</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="panel-body" style="border-top: 1px solid var(--line-subtle); background: var(--bg-canvas);">
+                  <div class="field-label" style="color: var(--vermilion); margin-bottom: 0.4rem;">SOLUCION AL RIESGO DE FRACCIONAMIENTO</div>
+                  <p style="font-size: 0.84rem; color: var(--ink-secondary); line-height: 1.6;">
+                    Dividir una compra grande en varias pequenas permite evadir cotizaciones y autoaprobar compras con sobreprecio. Para evitarlo, el sistema evalua el <strong>acumulado movil de 30 dias por area y proveedor</strong>, escalando automaticamente las ordenes fraccionadas.
+                  </p>
+                </div>
+              </div>
+
+              <div class="panel-box" style="margin-bottom: 0;">
+                <div class="panel-header">
+                  <div class="panel-title-wrap">
+                    <span class="panel-tag">WORKFLOW EN VIVO</span>
+                    <h2 class="panel-title">Emision y Firma de Ordenes por Rol</h2>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <form id="form-nueva-oc" class="clean-form-grid" style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line-subtle);">
+                    <div class="field-group">
+                      <label class="field-label" for="oc-area">Area Solicitante</label>
+                      <select id="oc-area" class="field-select">
+                        <option value="Obras">Obras (Acumulado Oct Prov. C: ₡2 107 000)</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                        <option value="Bodega Central">Bodega Central</option>
+                      </select>
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="oc-proveedor">Proveedor</label>
+                      <select id="oc-proveedor" class="field-select"></select>
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="oc-material">Material</label>
+                      <select id="oc-material" class="field-select"></select>
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="oc-cantidad">Cantidad</label>
+                      <input type="number" id="oc-cantidad" class="field-input" value="100" min="1" required />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="oc-precio">Precio Unitario (₡)</label>
+                      <input type="number" id="oc-precio" class="field-input" value="2150" min="1" required />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label" for="oc-cotizaciones">Cotizaciones Adjuntas</label>
+                      <input type="number" id="oc-cotizaciones" class="field-input" value="3" min="1" max="5" required />
+                    </div>
+                    <div class="field-group full" style="align-items: flex-end;">
+                      <button type="submit" class="btn-tech btn-primary">EMITIR ORDEN (VALIDAR UMBRAL 30D)</button>
+                    </div>
+                  </form>
+
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <span class="field-label">FIRMAR ORDENES PENDIENTES CON ROL:</span>
+                    <select id="rol-firmante-activo" class="field-select" style="padding: 0.4rem 0.65rem;">
+                      <option value="Gerencia Financiera">Gerencia Financiera</option>
+                      <option value="Jefatura de Compras">Jefatura de Compras</option>
+                      <option value="Jefatura del Area Solicitante">Jefatura del Area Solicitante</option>
+                      <option value="Gerencia General + Comite de Compras">Gerencia General + Comite</option>
+                    </select>
+                  </div>
+                  <div id="bandeja-oc-pendientes"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================
+             PAGINA 06: TAXONOMIA (A2) Y MATRIZ DE PROVEEDORES (A4 + OPCION 1)
+             ================================================================= -->
+        <section id="page-proveedores" class="view-page">
+          <div class="subnav-bar" data-group="prov">
+            <button type="button" class="subnav-btn active" data-sub="sub-prov-a2">01. Clasificacion de Categorias y Ahorro ERP (A2)</button>
+            <button type="button" class="subnav-btn" data-sub="sub-prov-a4">02. Matriz Ponderada de Proveedores (A4)</button>
+            <button type="button" class="subnav-btn" data-sub="sub-prov-comp">03. Comparador de Precios Vigentes (Opcion 1)</button>
+          </div>
+
+          <div id="sub-prov-a2" class="subview-pane active" data-group="prov">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">EJERCICIO A2</span>
+                  <h2 class="panel-title">Reclasificacion de las 8 Lineas del ERP en Taxonomia de Dos Niveles</h2>
+                </div>
+                <span style="font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; color: var(--oxide);">
+                  Ahorro Cemento (₡62 000) + Varilla (₡27 000) = ₡89 000 (₡117 000 con Guantes EPP)
+                </span>
+              </div>
+              <div class="table-wrap">
+                <table class="clean-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Descripcion en ERP</th>
+                      <th>Area / Proveedor</th>
+                      <th class="num-cell">Cant.</th>
+                      <th class="num-cell">Precio Pagado</th>
+                      <th class="num-cell">Gasto Real</th>
+                      <th>Taxonomia (Categoria &gt; Subcategoria)</th>
+                      <th>SKU Estandar</th>
+                      <th class="num-cell">Menor Precio</th>
+                      <th class="num-cell">Ahorro</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-a2-reclasificacion"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-prov-a4" class="subview-pane" data-group="prov">
+            <div class="split-2col">
+              <div class="panel-box" style="margin-bottom: 0;">
+                <div class="panel-header">
+                  <div class="panel-title-wrap">
+                    <span class="panel-tag">EJERCICIO A4</span>
+                    <h2 class="panel-title">Matriz Ponderada (Construplaza vs. Novex vs. EPA)</h2>
+                  </div>
+                </div>
+                <div class="table-wrap">
+                  <table class="clean-table">
+                    <thead>
+                      <tr>
+                        <th>Criterio</th>
+                        <th class="num-cell">Peso</th>
+                        <th class="num-cell">Construplaza</th>
+                        <th class="num-cell">Novex</th>
+                        <th class="num-cell">EPA</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody-matriz-a4"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="panel-box" style="margin-bottom: 0;">
+                <div class="panel-header">
+                  <div class="panel-title-wrap">
+                    <span class="panel-tag">ESTRATEGIA 80/20</span>
+                    <h2 class="panel-title">Ranking y Recomendacion de Adjudicacion</h2>
+                  </div>
+                </div>
+                <div class="panel-body" id="panel-ranking-a4"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-prov-comp" class="subview-pane" data-group="prov">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">INTEGRACION OPCION 1</span>
+                  <h2 class="panel-title">Comparador Automatico de Precios por Producto Normalizado</h2>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="clean-table">
+                  <thead>
+                    <tr>
+                      <th>SKU</th>
+                      <th>Material Estandarizado</th>
+                      <th>#1 Mejor Oferta</th>
+                      <th>#2 Segunda Oferta</th>
+                      <th>#3 Tercera Oferta</th>
+                      <th class="num-cell">Brecha</th>
+                      <th>Recomendacion</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-comparador-precios"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================================
+             PAGINA 07: MODELO DE DATOS ER Y CONSOLA API REST
+             ================================================================= -->
+        <section id="page-arquitectura" class="view-page">
+          <div class="subnav-bar" data-group="arq">
+            <button type="button" class="subnav-btn active" data-sub="sub-arq-er">01. Diagrama Entidad-Relacion (9 Tablas SQLite 3FN)</button>
+            <button type="button" class="subnav-btn" data-sub="sub-arq-api">02. Consola Interactiva de Endpoints REST</button>
+          </div>
+
+          <div id="sub-arq-er" class="subview-pane active" data-group="arq">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">MODELO DE DATOS 3FN</span>
+                  <h2 class="panel-title">Esquema Relacional de Base de Datos (Trazabilidad e Integridad Referencial)</h2>
+                </div>
+              </div>
+              <div class="panel-body" style="background: var(--bg-canvas); overflow-x: auto;">
+                <svg viewBox="0 0 1200 470" style="width: 100%; min-width: 900px; height: auto; display: block; font-family: 'IBM Plex Mono', monospace;">
+                  <path d="M 270 110 L 430 110" stroke="#121210" stroke-width="1.5" fill="none" />
+                  <path d="M 690 110 L 860 110" stroke="#121210" stroke-width="1.5" fill="none" />
+                  <path d="M 560 200 L 560 265" stroke="#C83214" stroke-width="2" fill="none" />
+                  <path d="M 270 330 L 430 330" stroke="#121210" stroke-width="1.5" fill="none" />
+                  <path d="M 690 330 L 860 330" stroke="#121210" stroke-width="1.5" fill="none" />
+                  <path d="M 145 200 L 145 265" stroke="#121210" stroke-width="1.5" fill="none" />
+                  <path d="M 985 200 L 985 265" stroke="#121210" stroke-width="1.5" fill="none" />
+
+                  <g transform="translate(20, 25)">
+                    <rect width="250" height="175" fill="#FAF9F5" stroke="#121210" stroke-width="1.5" />
+                    <rect width="250" height="30" fill="#121210" />
+                    <text x="12" y="20" fill="#F4F2EC" font-size="11" font-weight="600">proveedores (PK: id)</text>
+                    <text x="12" y="50" fill="#121210" font-size="10">codigo UNIQUE (PROV-A..NOV)</text>
+                    <text x="12" y="68" fill="#121210" font-size="10">nombre_comercial, cedula</text>
+                    <text x="12" y="86" fill="#121210" font-size="10">tiene_contrato_marco, num</text>
+                    <text x="12" y="104" fill="#121210" font-size="10">plazo_credito_dias</text>
+                    <text x="12" y="122" fill="#45443F" font-size="10">nota_precio..nota_riesgo (A4)</text>
+                    <text x="12" y="140" fill="#156236" font-size="10">estado (HOMOLOGADO...)</text>
+                  </g>
+
+                  <g transform="translate(430, 25)">
+                    <rect width="260" height="175" fill="#FAF9F5" stroke="#121210" stroke-width="2" />
+                    <rect width="260" height="30" fill="#C83214" />
+                    <text x="12" y="20" fill="#FFFFFF" font-size="11" font-weight="600">materiales (PK: id)</text>
+                    <text x="12" y="50" fill="#121210" font-size="10">codigo_estandar UNIQUE (SKU)</text>
+                    <text x="12" y="68" fill="#121210" font-size="10">categoria_codigo &gt; subcat (A2)</text>
+                    <text x="12" y="86" fill="#121210" font-size="10">demanda_diaria_prom (d)</text>
+                    <text x="12" y="104" fill="#121210" font-size="10">demanda_diaria_max (d_max)</text>
+                    <text x="12" y="122" fill="#121210" font-size="10">tiempo_entrega_dias (L)</text>
+                    <text x="12" y="140" fill="#1B3B9B" font-size="10">FK: proveedor_contrato_id</text>
+                    <text x="12" y="158" fill="#45443F" font-size="10">precio_contrato_colones</text>
+                  </g>
+
+                  <g transform="translate(860, 25)">
+                    <rect width="290" height="175" fill="#FAF9F5" stroke="#121210" stroke-width="1.5" />
+                    <rect width="290" height="30" fill="#121210" />
+                    <text x="12" y="20" fill="#F4F2EC" font-size="11" font-weight="600">stock_ubicacion &amp; ubicaciones</text>
+                    <text x="12" y="50" fill="#1B3B9B" font-size="10">FK: material_id -&gt; materiales.id</text>
+                    <text x="12" y="68" fill="#1B3B9B" font-size="10">FK: ubicacion_id -&gt; ubicaciones.id</text>
+                    <text x="12" y="86" fill="#121210" font-size="10">cantidad REAL CHECK (&gt;= 0)</text>
+                    <text x="12" y="104" fill="#121210" font-size="10">ubicaciones: BOD-CEN, OBR, MNT</text>
+                    <text x="12" y="122" fill="#45443F" font-size="10">responsable, provincia</text>
+                    <text x="12" y="140" fill="#156236" font-size="10">UNIQUE(material_id, ubicacion_id)</text>
+                  </g>
+
+                  <g transform="translate(20, 265)">
+                    <rect width="250" height="180" fill="#FAF9F5" stroke="#121210" stroke-width="1.5" />
+                    <rect width="250" height="30" fill="#121210" />
+                    <text x="12" y="20" fill="#F4F2EC" font-size="11" font-weight="600">ordenes_compra (PK: id)</text>
+                    <text x="12" y="50" fill="#121210" font-size="10">numero_oc UNIQUE (OC-1041..)</text>
+                    <text x="12" y="68" fill="#1B3B9B" font-size="10">FK: proveedor_id, material_id</text>
+                    <text x="12" y="86" fill="#121210" font-size="10">cantidad, precio_unitario</text>
+                    <text x="12" y="104" fill="#C83214" font-size="10">es_fuera_contrato, sobreprecio</text>
+                    <text x="12" y="122" fill="#121210" font-size="10">rol_aprobador_requerido (A1)</text>
+                    <text x="12" y="140" fill="#121210" font-size="10">estado_aprobacion, aprobado_por</text>
+                  </g>
+
+                  <g transform="translate(430, 265)">
+                    <rect width="260" height="180" fill="#FAF9F5" stroke="#121210" stroke-width="2" />
+                    <rect width="260" height="30" fill="#121210" />
+                    <text x="12" y="20" fill="#F4F2EC" font-size="11" font-weight="600">movimientos_inventario</text>
+                    <text x="12" y="50" fill="#121210" font-size="10">codigo_movimiento UNIQUE</text>
+                    <text x="12" y="68" fill="#121210" font-size="10">tipo (ENTRADA|SALIDA|TRASLADO)</text>
+                    <text x="12" y="86" fill="#1B3B9B" font-size="10">FK: material_id, orden_compra_id</text>
+                    <text x="12" y="104" fill="#1B3B9B" font-size="10">FK: ubicacion_origen / destino</text>
+                    <text x="12" y="122" fill="#121210" font-size="10">documento_origen, lote_serie</text>
+                    <text x="12" y="140" fill="#121210" font-size="10">usuario_responsable</text>
+                    <text x="12" y="158" fill="#156236" font-size="10">saldo_resultante_material</text>
+                  </g>
+
+                  <g transform="translate(860, 265)">
+                    <rect width="290" height="180" fill="#FAF9F5" stroke="#121210" stroke-width="1.5" />
+                    <rect width="290" height="30" fill="#121210" />
+                    <text x="12" y="20" fill="#F4F2EC" font-size="11" font-weight="600">alertas &amp; historico_precios</text>
+                    <text x="12" y="50" fill="#C83214" font-size="10">alertas: REORDEN | OC_DUPLICADA</text>
+                    <text x="12" y="68" fill="#1B3B9B" font-size="10">FK: material_id, orden_compra_id</text>
+                    <text x="12" y="86" fill="#121210" font-size="10">impacto_colones, severidad</text>
+                    <text x="12" y="112" fill="#121210" font-size="10">historico_precios_proveedor:</text>
+                    <text x="12" y="130" fill="#45443F" font-size="10">precio_colones, fecha_captura</text>
+                    <text x="12" y="148" fill="#45443F" font-size="10">variacion_porcentual (Opcion 1)</text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div id="sub-arq-api" class="subview-pane" data-group="arq">
+            <div class="panel-box">
+              <div class="panel-header">
+                <div class="panel-title-wrap">
+                  <span class="panel-tag">ENDPOINTS EN VIVO</span>
+                  <h2 class="panel-title">Consola de Inspeccion JSON de la API REST</h2>
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button type="button" class="btn-tech btn-api-probe" data-endpoint="/materiales/1/stock">GET /materiales/1/stock</button>
+                  <button type="button" class="btn-tech btn-api-probe" data-endpoint="/alertas/reorden">GET /alertas/reorden</button>
+                  <button type="button" class="btn-tech btn-api-probe" data-endpoint="/ordenes/posibles-duplicados">GET /ordenes/posibles-duplicados</button>
+                  <button type="button" class="btn-tech btn-api-probe" data-endpoint="/materiales/1/trazabilidad">GET /materiales/1/trazabilidad</button>
+                </div>
+              </div>
+              <div class="panel-body" style="background: var(--ink-primary); color: var(--ink-light);">
+                <div id="api-probe-url" style="font-family: var(--font-mono); font-size: 0.75rem; color: #A09D93; margin-bottom: 0.75rem; border-bottom: 1px solid #2C2C28; padding-bottom: 0.5rem;">
+                  ENDPOINT ACTIVO: GET /alertas/reorden
+                </div>
+                <pre id="api-probe-output" style="font-family: var(--font-mono); font-size: 0.79rem; line-height: 1.55; max-height: 440px; overflow: auto;"></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Drawer deslizable para Trazabilidad Kardex por Material -->
+  <div id="drawer-backdrop" class="overlay-backdrop"></div>
+  <aside id="kardex-drawer" class="side-drawer" aria-label="Trazabilidad de existencias">
+    <div class="drawer-top">
+      <div>
+        <div id="drawer-sku" style="font-family: var(--font-mono); font-size: 0.72rem; color: #FF7A5C; text-transform: uppercase;">SKU</div>
+        <h3 id="drawer-title" style="font-family: var(--font-display); font-size: 1.25rem; margin-top: 0.2rem;">Trazabilidad Completa</h3>
+      </div>
+      <button type="button" id="btn-close-drawer" class="btn-tech" style="background: transparent; color: #FFFFFF; border-color: #555;">CERRAR [ESC]</button>
+    </div>
+    <div class="drawer-scroll" id="drawer-body-content"></div>
+  </aside>
+
+  <div id="toast-notification" class="toast-bar" role="status" aria-live="polite"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

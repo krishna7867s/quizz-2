@@ -1,0 +1,155 @@
+{
+  "name": "Constructora Del Valle S.A. — Control de Inventario, Reorden y Detector de OC Duplicadas",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "kardex-movimientos",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "node-webhook-kardex",
+      "name": "Webhook Movimiento Kardex",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 240]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO movimientos_inventario (codigo_movimiento, fecha_hora, tipo_movimiento, material_id, cantidad, costo_unitario_colones, ubicacion_origen_id, ubicacion_destino_id, documento_origen, lote_serie, usuario_responsable, saldo_resultante_material) VALUES ({{ $json.codigo_movimiento }}, NOW(), {{ $json.tipo_movimiento }}, {{ $json.material_id }}, {{ $json.cantidad }}, {{ $json.costo_unitario_colones }}, {{ $json.ubicacion_origen_id }}, {{ $json.ubicacion_destino_id }}, {{ $json.documento_origen }}, {{ $json.lote_serie }}, {{ $json.usuario_responsable }}, {{ $json.saldo_resultante_material }}) RETURNING *;"
+      },
+      "id": "node-db-insert-mov",
+      "name": "DB Insertar Movimiento",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [460, 240]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculo dinamico de Stock de Seguridad (SS) y Punto de Reorden (PR)\n// Formulas Ejercicio A5: SS = (d_max - d_prom) * L  |  PR = (d_prom * L) + SS\nconst items = $input.all();\nreturn items.map((item) => {\n  const d = item.json;\n  const dProm = Number(d.demanda_diaria_prom || 40);\n  const dMax = Number(d.demanda_diaria_max || 55);\n  const L = Number(d.tiempo_entrega_dias || 3);\n  const stockActual = Number(d.saldo_resultante_material || 155);\n\n  const stockSeguridad = (dMax - dProm) * L;\n  const puntoReorden = (dProm * L) + stockSeguridad;\n  const bajoPuntoReorden = stockActual <= puntoReorden;\n\n  return {\n    json: {\n      ...d,\n      stock_seguridad: stockSeguridad,\n      punto_reorden: puntoReorden,\n      stock_actual: stockActual,\n      bajo_punto_reorden: bajoPuntoReorden,\n      deficit_unidades: bajoPuntoReorden ? (puntoReorden - stockActual) : 0\n    }\n  };\n});"
+      },
+      "id": "node-code-reorden",
+      "name": "Code Calcular Stock y PR",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 240]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.bajo_punto_reorden }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "node-if-bajo-pr",
+      "name": "IF Stock <= PR",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [940, 240]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/alertas/reorden",
+        "method": "GET",
+        "options": {}
+      },
+      "id": "node-alerta-reorden",
+      "name": "Emitir Alerta de Reorden y Sugerir Mejor Proveedor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 180]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "node-schedule-diario",
+      "name": "Schedule Trigger Auditoria Diaria (06:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [220, 520]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Regla de deteccion de Compras Duplicadas y Fraccionamiento (Ejercicio A3)\n// Criterio: Mismo proveedor + Mismo articulo normalizado + Diferencia <= 3 dias + Variacion cantidad <= 10%\nconst ordenes = $input.all().map(i => i.json);\nconst sospechosas = [];\n\nfor (let i = 0; i < ordenes.length; i++) {\n  for (let j = i + 1; j < ordenes.length; j++) {\n    const a = ordenes[i];\n    const b = ordenes[j];\n    if (a.proveedor_id === b.proveedor_id && a.material_id === b.material_id) {\n      const diffDias = Math.round(Math.abs(new Date(a.fecha_emision) - new Date(b.fecha_emision)) / 86400000);\n      const maxCant = Math.max(a.cantidad, b.cantidad);\n      const diffPct = ((Math.abs(a.cantidad - b.cantidad) / maxCant) * 100);\n      if (diffDias <= 3 && diffPct <= 10) {\n        sospechosas.push({\n          par: `${a.numero_oc} <-> ${b.numero_oc}`,\n          diferencia_dias: diffDias,\n          variacion_cantidad_pct: Number(diffPct.toFixed(2)),\n          monto_comprometido_colones: b.monto_total_colones,\n          evade_umbral_gerencia: (a.monto_total_colones + b.monto_total_colones) > 2000000\n        });\n      }\n    }\n  }\n}\nreturn sospechosas.map(s => ({ json: s }));"
+      },
+      "id": "node-code-duplicados",
+      "name": "Code Detector OC Duplicadas y Fraccionadas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [520, 520]
+    }
+  ],
+  "connections": {
+    "Webhook Movimiento Kardex": {
+      "main": [
+        [
+          {
+            "node": "DB Insertar Movimiento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DB Insertar Movimiento": {
+      "main": [
+        [
+          {
+            "node": "Code Calcular Stock y PR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Calcular Stock y PR": {
+      "main": [
+        [
+          {
+            "node": "IF Stock <= PR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Stock <= PR": {
+      "main": [
+        [
+          {
+            "node": "Emitir Alerta de Reorden y Sugerir Mejor Proveedor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger Auditoria Diaria (06:00)": {
+      "main": [
+        [
+          {
+            "node": "Code Detector OC Duplicadas y Fraccionadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

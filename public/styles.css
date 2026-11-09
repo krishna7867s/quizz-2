@@ -1,0 +1,849 @@
+/* =============================================================================
+   CONSTRUCTORA DEL VALLE S.A. — SISTEMA DE INVENTARIOS Y AUDITORIA DE COMPRAS
+   Arquitectura Visual: Editorial Industrial Suiza — Espaciosa, Limpia y Modular
+   Cero sombras difusas genericas — Jerarquia por espacio en blanco y lineas 1px
+   ============================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  --bg-canvas: #F4F2EC;
+  --bg-surface: #FAF9F6;
+  --bg-muted: #EBE8DF;
+  --bg-sidebar: #121210;
+  --bg-sidebar-hover: #1E1E1B;
+
+  --ink-primary: #121210;
+  --ink-secondary: #4A4943;
+  --ink-muted: #7C7970;
+  --ink-light: #F4F2EC;
+
+  --line-subtle: #D8D4C8;
+  --line-strong: #121210;
+
+  --vermilion: #C83214;
+  --vermilion-soft: #FBEAE6;
+  --amber: #A84B08;
+  --amber-soft: #FCF1E1;
+  --oxide: #156236;
+  --oxide-soft: #E6F3EA;
+  --cobalt: #1B3B9B;
+  --cobalt-soft: #E8EEF9;
+
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 15px;
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--bg-canvas);
+  overflow-x: hidden;
+}
+
+/* =============================================================================
+   ESTRUCTURA GENERAL: SIDEBAR LATERAL FIJO + LIENZO ESPACIOSO
+   ============================================================================= */
+.app-shell {
+  display: grid;
+  grid-template-columns: 272px 1fr;
+  min-height: 100vh;
+}
+
+/* Barra lateral izquierda */
+.app-sidebar {
+  background-color: var(--bg-sidebar);
+  color: var(--ink-light);
+  border-right: 1px solid var(--line-strong);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 1.75rem 0;
+  z-index: 40;
+}
+
+.sidebar-brand {
+  padding: 0 1.5rem 1.6rem 1.5rem;
+  border-bottom: 1px solid #282824;
+}
+
+.sidebar-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9A978D;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.55rem;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #22C55E;
+  display: inline-block;
+  animation: pulseDot 2.4s infinite var(--ease-out-expo);
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.4; }
+}
+
+.sidebar-company {
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #FFFFFF;
+}
+
+.sidebar-sub {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.02rem;
+  color: #B5B2A8;
+  margin-top: 0.2rem;
+}
+
+/* Menu de navegacion vertical espacioso */
+.sidebar-nav {
+  padding: 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #757268;
+  padding: 0.75rem 0.75rem 0.35rem 0.75rem;
+}
+
+.nav-item {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #C7C4BA;
+  text-align: left;
+  padding: 0.75rem 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  transition:
+    background-color 0.2s var(--ease-out-quart),
+    color 0.2s var(--ease-out-quart),
+    border-color 0.2s var(--ease-out-quart),
+    transform 0.2s var(--ease-out-quart);
+}
+
+.nav-item:hover {
+  background-color: var(--bg-sidebar-hover);
+  color: #FFFFFF;
+  transform: translateX(3px);
+}
+
+.nav-item.active {
+  background-color: var(--bg-surface);
+  color: var(--ink-primary);
+  border-color: var(--line-strong);
+  font-weight: 600;
+}
+
+.nav-item-left {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+}
+
+.nav-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #7E7B72;
+}
+
+.nav-item.active .nav-num {
+  color: var(--vermilion);
+  font-weight: 600;
+}
+
+.nav-title {
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+}
+
+.nav-pill {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid #383833;
+  color: #9A978D;
+}
+
+.nav-item.active .nav-pill {
+  border-color: var(--ink-primary);
+  color: var(--ink-primary);
+}
+
+.sidebar-footer {
+  padding: 1.25rem 1.5rem 0 1.5rem;
+  border-top: 1px solid #282824;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+/* =============================================================================
+   LIENZO PRINCIPAL (MAIN STAGE) CON AMPLIO ESPACIO EN BLANCO
+   ============================================================================= */
+.app-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stage-topbar {
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--line-subtle);
+  padding: 1.35rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.stage-breadcrumb {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  margin-bottom: 0.25rem;
+}
+
+.stage-heading {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--ink-primary);
+}
+
+.stage-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Contenido central con maximo aire y lectura comoda */
+.stage-content {
+  max-width: 1340px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem 3rem 4rem 3rem;
+}
+
+/* Vistas principales */
+.view-page {
+  display: none;
+}
+
+.view-page.active {
+  display: block;
+  animation: pageFadeIn 0.42s var(--ease-out-expo) forwards;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sub-navegacion limpia (Segmented Bar) para dividir contenido sin saturar */
+.subnav-bar {
+  display: inline-flex;
+  border: 1px solid var(--line-strong);
+  background-color: var(--bg-surface);
+  margin-bottom: 2rem;
+}
+
+.subnav-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--line-subtle);
+  padding: 0.65rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.subnav-btn:last-child {
+  border-right: none;
+}
+
+.subnav-btn:hover {
+  background-color: var(--bg-muted);
+  color: var(--ink-primary);
+}
+
+.subnav-btn.active {
+  background-color: var(--ink-primary);
+  color: var(--ink-light);
+  font-weight: 600;
+}
+
+.subview-pane {
+  display: none;
+}
+
+.subview-pane.active {
+  display: block;
+  animation: pageFadeIn 0.35s var(--ease-out-expo) forwards;
+}
+
+/* =============================================================================
+   BOTONES MECANICOS NITIDOS (CERO SOMBRAS BORROSAS)
+   ============================================================================= */
+.btn-tech {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.62rem 1.05rem;
+  border: 1px solid var(--line-strong);
+  background-color: var(--bg-surface);
+  color: var(--ink-primary);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition:
+    transform 0.18s var(--ease-out-quart),
+    background-color 0.18s var(--ease-out-quart),
+    color 0.18s var(--ease-out-quart);
+}
+
+.btn-tech:hover {
+  background-color: var(--ink-primary);
+  color: var(--ink-light);
+  transform: translateY(-1px);
+}
+
+.btn-tech.btn-primary {
+  background-color: var(--ink-primary);
+  color: var(--ink-light);
+}
+
+.btn-tech.btn-primary:hover {
+  background-color: var(--vermilion);
+  border-color: var(--vermilion);
+}
+
+.btn-tech.btn-vermilion {
+  background-color: var(--vermilion);
+  color: #FFFFFF;
+  border-color: var(--vermilion);
+}
+
+.btn-tech.btn-vermilion:hover {
+  background-color: var(--ink-primary);
+  border-color: var(--ink-primary);
+}
+
+.btn-tech.btn-sidebar {
+  width: 100%;
+  justify-content: center;
+  background-color: #1C1C19;
+  color: #E2DFD7;
+  border-color: #363630;
+  font-size: 0.71rem;
+  padding: 0.55rem 0.75rem;
+}
+
+.btn-tech.btn-sidebar:hover {
+  background-color: var(--vermilion);
+  border-color: var(--vermilion);
+  color: #FFFFFF;
+}
+
+/* =============================================================================
+   TARJETAS Y PANELES CON AIRE Y RESPIRO VISUAL
+   ============================================================================= */
+.metric-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2.25rem;
+}
+
+.metric-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--line-strong);
+  padding: 1.5rem 1.65rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.22s var(--ease-out-quart);
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+}
+
+.metric-overline {
+  font-family: var(--font-mono);
+  font-size: 0.69rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  margin-bottom: 0.75rem;
+}
+
+.metric-number {
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.5rem;
+}
+
+.metric-caption {
+  font-size: 0.8rem;
+  color: var(--ink-secondary);
+  line-height: 1.45;
+}
+
+/* Bloques de contenido limpios */
+.panel-box {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--line-strong);
+  margin-bottom: 2rem;
+}
+
+.panel-header {
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid var(--line-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.panel-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.panel-tag {
+  font-family: var(--font-mono);
+  font-size: 0.69rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  background-color: var(--ink-primary);
+  color: var(--ink-light);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.panel-body {
+  padding: 1.75rem;
+}
+
+/* Layouts de 2 y 3 columnas con separacion clara */
+.split-2col {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 1.75rem;
+}
+
+.split-2col-equal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.75rem;
+}
+
+.split-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+/* Tablas descongestionadas y legibles */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.clean-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+}
+
+.clean-table th {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  background-color: var(--bg-canvas);
+  border-bottom: 1px solid var(--line-strong);
+  padding: 0.95rem 1.25rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.clean-table td {
+  padding: 1.05rem 1.25rem;
+  border-bottom: 1px solid var(--line-subtle);
+  vertical-align: middle;
+}
+
+.clean-table tbody tr {
+  transition: background-color 0.16s ease;
+}
+
+.clean-table tbody tr:hover {
+  background-color: var(--bg-canvas);
+}
+
+.clean-table tbody tr.row-alert {
+  background-color: rgba(200, 50, 20, 0.05);
+}
+
+.num-cell {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.sku-tag {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.18rem 0.5rem;
+  border: 1px solid var(--line-subtle);
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+  display: inline-block;
+}
+
+.status-pill {
+  font-family: var(--font-mono);
+  font-size: 0.69rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid currentColor;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.pill-critical {
+  color: var(--vermilion);
+  background-color: var(--vermilion-soft);
+}
+
+.pill-warning {
+  color: var(--amber);
+  background-color: var(--amber-soft);
+}
+
+.pill-ok {
+  color: var(--oxide);
+  background-color: var(--oxide-soft);
+}
+
+.pill-info {
+  color: var(--cobalt);
+  background-color: var(--cobalt-soft);
+}
+
+/* Medidor limpio de Stock vs PR */
+.meter-box {
+  min-width: 180px;
+}
+
+.meter-top {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  margin-bottom: 0.35rem;
+  color: var(--ink-secondary);
+}
+
+.meter-bar {
+  height: 9px;
+  background-color: var(--bg-muted);
+  border: 1px solid var(--line-strong);
+  position: relative;
+}
+
+.meter-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.8s var(--ease-out-expo);
+}
+
+.meter-fill.critical { background-color: var(--vermilion); }
+.meter-fill.warning { background-color: var(--amber); }
+.meter-fill.ok { background-color: var(--oxide); }
+
+.meter-pr-line {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background-color: var(--ink-primary);
+}
+
+/* Paso a paso del circuito A1 */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.step-card {
+  padding: 1.25rem;
+  border-right: 1px solid var(--line-subtle);
+  cursor: pointer;
+  background-color: var(--bg-surface);
+  transition: background-color 0.2s ease;
+}
+
+.step-card:last-child {
+  border-right: none;
+}
+
+.step-card:hover {
+  background-color: var(--bg-muted);
+}
+
+.step-card.active {
+  background-color: var(--ink-primary);
+  color: var(--ink-light);
+}
+
+/* Formularios con buen espacio */
+.clean-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-group.full {
+  grid-column: 1 / -1;
+}
+
+.field-label {
+  font-family: var(--font-mono);
+  font-size: 0.71rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-secondary);
+}
+
+.field-input,
+.field-select {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--line-strong);
+  background-color: var(--bg-surface);
+  color: var(--ink-primary);
+  outline: none;
+}
+
+.field-input:focus,
+.field-select:focus {
+  border-color: var(--cobalt);
+  background-color: #FFFFFF;
+}
+
+/* Animaciones escalonadas y vectoriales */
+.stagger-row {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: staggerReveal 0.38s var(--ease-out-expo) forwards;
+  animation-delay: calc(var(--idx, 0) * 45ms);
+}
+
+@keyframes staggerReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.svg-draw-path {
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: drawLine 1.2s var(--ease-out-expo) forwards;
+}
+
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Drawer lateral de trazabilidad y Modal de movimiento */
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(18, 18, 16, 0.5);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+
+.overlay-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.side-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(820px, 92vw);
+  background-color: var(--bg-surface);
+  border-left: 2px solid var(--line-strong);
+  z-index: 100;
+  transform: translateX(100%);
+  transition: transform 0.4s var(--ease-out-expo);
+  display: flex;
+  flex-direction: column;
+}
+
+.side-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-top {
+  padding: 1.5rem 2rem;
+  background-color: var(--ink-primary);
+  color: var(--ink-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-scroll {
+  padding: 2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.toast-bar {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  z-index: 130;
+  background-color: var(--ink-primary);
+  color: var(--ink-light);
+  border: 2px solid var(--vermilion);
+  padding: 1rem 1.35rem;
+  max-width: 440px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  transform: translateY(150%);
+  transition: transform 0.35s var(--ease-out-expo);
+}
+
+.toast-bar.visible {
+  transform: translateY(0);
+}
+
+@media (max-width: 1120px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+  .app-sidebar {
+    position: relative;
+    height: auto;
+  }
+  .metric-grid-4,
+  .split-2col,
+  .split-2col-equal,
+  .split-3col,
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+  .stage-content,
+  .stage-topbar {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}

@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Informe Tecnico Quiz #2 — Gestion de Inventarios — Constructora Del Valle S.A.</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    body {
+      background: #E6E4DD;
+      padding: 2rem 1rem;
+    }
+    .report-toolbar {
+      max-width: 980px;
+      margin: 0 auto 1.25rem auto;
+      background: var(--bg-carbon);
+      color: var(--ink-on-dark);
+      padding: 0.85rem 1.25rem;
+      border: 1px solid var(--border-strong);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .report-sheet {
+      max-width: 980px;
+      margin: 0 auto;
+      background: #FAF9F5;
+      border: 1px solid #121210;
+      padding: 3rem 3.25rem;
+    }
+    .report-sec {
+      margin-bottom: 2.4rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .report-sec:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .sec-head {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #121210;
+      padding-bottom: 0.45rem;
+    }
+    .sec-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #121210;
+      color: #FAF9F5;
+      padding: 0.15rem 0.5rem;
+    }
+    .sec-title {
+      font-family: var(--font-display);
+      font-size: 1.28rem;
+      font-weight: 700;
+    }
+    .prose-p {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--ink-primary);
+      margin-bottom: 0.85rem;
+      text-align: justify;
+    }
+    .editable-line {
+      border-bottom: 1px solid #121210;
+      display: inline-block;
+      min-width: 260px;
+      padding: 0 0.35rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    @media print {
+      body {
+        background: #FFFFFF;
+        padding: 0;
+      }
+      .report-toolbar {
+        display: none !important;
+      }
+      .report-sheet {
+        border: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="report-toolbar">
+    <div style="font-family: var(--font-mono); font-size: 0.76rem;">
+      ENTREGABLE 1 // INFORME ESCRITO (PARTE A + PARTE B + DIAGRAMAS) — CAMPOS DE EQUIPO EDITABLES CON UN CLIC
+    </div>
+    <div style="display: flex; gap: 0.6rem;">
+      <a href="/" class="btn-tech" style="background: transparent; color: #FFF; border-color: #555;">VOLVER AL SISTEMA EN VIVO</a>
+      <button type="button" onclick="window.print()" class="btn-tech btn-vermilion">IMPRIMIR / EXPORTAR A PDF</button>
+    </div>
+  </div>
+
+  <article class="report-sheet">
+    <!-- Portada / Encabezado Oficial -->
+    <header style="border-bottom: 3px solid #121210; padding-bottom: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted);">
+            QUIZ #2 · TRABAJO PRACTICO · GESTION DE INVENTARIOS (ANTES: COMPRAS Y PROVEEDORES)
+          </div>
+          <h1 style="font-family: var(--font-display); font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; margin-top: 0.3rem;">
+            Auditoria de Abastecimiento y Sistema de Control de Inventarios
+          </h1>
+          <div style="font-family: var(--font-serif); font-style: italic; font-size: 1.35rem; color: var(--ink-secondary);">
+            Caso Practico: Constructora Del Valle S.A. (Obras, Mantenimiento y Bodega Central)
+          </div>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 0.75rem; border: 1px solid #121210; padding: 0.65rem 0.9rem; background: var(--bg-paper);">
+          <div><strong>ENTREGA:</strong> Viernes 6 de noviembre de 2026</div>
+          <div><strong>COMPONENTES:</strong> Parte A (40 pts) + Parte B (60 pts)</div>
+          <div><strong>STACK:</strong> Node.js REST API + SQLite 3FN</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.25rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.86rem; background: var(--bg-paper); border: 1px solid var(--border-hairline); padding: 0.85rem 1rem;">
+        <div>
+          <strong>Nombre del equipo:</strong>
+          <span class="editable-line" contenteditable="true">Grupo Ingenieria Del Valle</span>
+        </div>
+        <div>
+          <strong>Integrantes:</strong>
+          <span class="editable-line" contenteditable="true">Editar nombres de integrantes aqui</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- EJERCICIO A1 -->
+    <section class="report-sec">
+      <div class="sec-head">
+        <span class="sec-tag">EJERCICIO A1 (8 PTS)</span>
+        <h2 class="sec-title">El Circuito de Compra, el Cotejo Three-Way Match y la Matriz de Aprobacion</h2>
+      </div>
+
+      <p class="prose-p">
+        <strong>a) Circuito completo de una compra desde la requisicion hasta el pago:</strong> Para evitar que Obras, Mantenimiento y Bodega Central comprometan fondos de la empresa sin trazabilidad ni validacion cruzada, se establece un circuito formal de seis etapas con estricta segregacion de funciones (quien solicita no compra, quien compra no recibe fisicamente la mercancia, y quien recibe no libera el pago).
+      </p>
+
+      <!-- Diagrama SVG del Circuito de Compra -->
+      <div style="border: 1px solid #121210; padding: 1rem; background: var(--bg-paper); margin-bottom: 1.15rem;">
+        <svg viewBox="0 0 920 145" style="width: 100%; height: auto; font-family: 'IBM Plex Mono', monospace;">
+          <g transform="translate(8, 15)">
+            <rect width="135" height="110" fill="#FAF9F5" stroke="#121210" stroke-width="1.5" />
+            <rect width="135" height="22" fill="#121210" />
+            <text x="8" y="15" fill="#FFF" font-size="9" font-weight="600">1. REQUISICION</text>
+            <text x="8" y="40" fill="#121210" font-size="8.5" font-weight="600">Ejec: Area Usuaria</text>
+            <text x="8" y="56" fill="#45443F" font-size="8">Doc: REQ-XXXX</text>
+            <text x="8" y="74" fill="#156236" font-size="8">Ctrl: Stock Bodega</text>
+            <text x="8" y="88" fill="#156236" font-size="8">y SKU Maestro</text>
+          </g>
+          <path d="M 143 70 L 160 70" stroke="#121210" stroke-width="1.5" />
+
+          <g transform="translate(160, 15)">
+            <rect width="135" height="110" fill="#FAF9F5" stroke="#121210" stroke-width="1.5" />
+            <rect width="135" height="22" fill="#121210" />
+            <text x="8" y="15" fill="#FFF" font-size="9" font-weight="600">2. APROBACION</text>
+            <text x="8" y="40" fill="#121210" font-size="8.5" font-weight="600">Ejec: Rol Matriz A1</text>
+            <text x="8" y="56" fill="#45443F" font-size="8">Doc: REQ Aprobada</text>
+            <text x="8" y="74" fill="#C83214" font-size="8">Ctrl: Acumulado 30d</text>
+            <text x="8" y="88" fill="#C83214" font-size="8">y N° Cotizaciones</text>
+          </g>
+          <path d="M 295 70 L 312 70" stroke="#121210" stroke-width="1.5" />
+
+          <g transform="translate(312, 15)">
+            <rect width="135" height="110" fill="#FAF9F5" stroke="#121210" stroke-width="1.5" />
+            <rect width="135" height="22" fill="#121210" />
+            <text x="8" y="15" fill="#FFF" font-size="9" font-weight="600">3. ORDEN COMPRA</text>
+            <text x="8" y="40" fill="#121210" font-size="8.5" font-weight="600">Ejec: Compras</text>
+            <text x="8" y="56" fill="#45443F" font-size="8">Doc: OC-XXXX</text>
+            <text x="8" y="74" fill="#1B3B9B" font-size="8">Ctrl: Tarifa Contrato</text>
+            <text x="8" y="88" fill="#1B3B9B" font-size="8">y Filtro Duplicados</text>
+          </g>
+          <path d="M 447 70 L 464 70" stroke="#121210" stroke-width="1.5" />
+
+          <g transform="translate(464, 15)">
+            <rect width="135" height="110" fill="#FAF9F5" stroke="#121210" stroke-width="1.5" />
+            <rect width="135" height="22" fill="#121210" />
+            <text x="8" y="15" fill="#FFF" font-size="9" font-weight="600">4. RECEPCION</text>
+            <text x="8" y="40" fill="#121210" font-size="8.5" font-weight="600">Ejec: Bodega/Obra</text>
+            <text x="8" y="56" fill="#45443F" font-size="8">Doc: REC-XXXX</text>
+            <text x="8" y="74" fill="#156236" font-size="8">Ctrl: Conteo Ciego</text>
+            <text x="8" y="88" fill="#156236" font-size="8">y Entrada Kardex</text>
+          </g>
+          <path d="M 599 70 L 616 70" stroke="#121210" stroke-width="1.5" />
+
+          <g transform="translate(616, 15)">
+            <rect width="142" height="110" fill="#FAF9F5" stroke="#C83214" stroke-width="2" />
+            <rect width="142" height="22" fill="#C83214" />
+            <text x="8" y="15" fill="#FFF" font-size="9" font-weight="600">5. 3-WAY MATCH</text>
+            <text x="8" y="40" fill="#121210" font-size="8.5" font-weight="600">Ejec: Contabilidad</text>
+            <text x="8" y="56" fill="#45443F" font-size="8">Doc: Factura FE-XML</text>
+            <text x="8" y="74" fill="#C83214" font-size="8">Ctrl: Cruce OC vs</text>
+            <text x="8" y="88" fill="#C83214" font-size="8">Recepcion vs Factura</text>
+          </g>
+          <path d="M 758 70 L 775 70" stroke="#121210" stroke-width="1.5" />
+
+          <g transform="translate(775, 15)">
+            <rect width="135" height="110" fill="#FAF9F5" stroke="#121210" stroke-width="1.5" />
+            <rect width="135" height="22" fill="#121210" />
+            <text x="8" y="15" fill="#FFF" font-size="9" font-weight="600">6. PAGO TESORERIA</text>
+            <text x="8" y="40" fill="#121210" font-size="8.5" font-weight="600">Ejec: Tesoreria</text>
+            <text x="8" y="56" fill="#45443F" font-size="8">Doc: Comp. SINPE</text>
+            <text x="8" y="74" fill="#156236" font-size="8">Ctrl: Plazo Credito</text>
+            <text x="8" y="88" fill="#156236" font-size="8">y Firma Mancomunada</text>
+          </g>
+        </svg>
+      </div>
+
+      <table class="tech-table" style="margin-bottom: 1.25rem;">
+        <thead>
+          <tr>
+            <th>Etapa</th>
+            <th>Responsable que la Ejecuta</th>
+            <th>Documento Generado</th>
+            <th>Control Interno y de Sistema Aplicado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. Requisicion</strong></td>
+            <td>Ingeniero Residente (Obras), Jefe de Mantenimiento o Bodeguero Central</td>
+            <td>Requisicion de Compra (<code>REQ-XXXX</code>)</td>
+            <td>Verificacion previa de stock disponible en Bodega Central para evitar compras redundantes; uso obligatorio de SKU normalizado y validacion de presupuesto.</td>
+          </tr>
+          <tr>
+            <td><strong>2. Aprobacion</strong></td>
+            <td>Jefatura de Area, Jefatura de Compras, Gerencia Financiera o Gerencia General + Comite</td>
+            <td>Requisicion Autorizada y Cuadro Comparativo</td>
+            <td>Segregacion de funciones; validacion del numero minimo de cotizaciones y calculo del acumulado movil de 30 dias para bloquear fraccionamiento.</td>
+          </tr>
+          <tr>
+            <td><strong>3. Orden de Compra</strong></td>
+            <td>Departamento de Compras y Abastecimiento</td>
+            <td>Orden de Compra Formal (<code>OC-XXXX</code>)</td>
+            <td>Bloqueo automatico del precio unitario segun Contrato Marco vigente y alerta preventiva de OC duplicada (mismo proveedor, articulo, cantidad y fecha cercana).</td>
+          </tr>
+          <tr>
+            <td><strong>4. Recepcion Fisica</strong></td>
+            <td>Bodeguero de Obra o Recepcionista de Bodega Central</td>
+            <td>Boleta de Entrada a Almacen (<code>REC-XXXX</code>)</td>
+            <td>Recepcion ciega (copia de OC sin cantidades para forzar conteo fisico real), inspeccion de calidad/lote y registro inmediato de entrada en el Kardex.</td>
+          </tr>
+          <tr>
+            <td><strong>5. Factura y Validacion</strong></td>
+            <td>Contabilidad (Cuentas por Pagar)</td>
+            <td>Acta de Cotejo + Factura Electronica (<code>FE-XXXX</code>)</td>
+            <td><strong>Three-Way Match (Cotejo de Tres Vias):</strong> verificacion cruzada exacta entre OC (precio autorizado), Boleta de Recepcion (cantidad recibida) y Factura.</td>
+          </tr>
+          <tr>
+            <td><strong>6. Pago</strong></td>
+            <td>Tesoreria y Mancomunidad de Firmas Bancarias</td>
+            <td>Comprobante de Pago / SINPE (<code>PAG-XXXX</code>)</td>
+            <td>Ejecucion al vencimiento del credito negociado (30-60 dias), doble firma bancaria y sellado digital de documentos como <code>LIQUIDADOS</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="prose-p">
+        <strong>b) Analisis de la matriz de aprobacion propuesta y riesgo de fraccionamiento (Split Purchasing):</strong> La matriz original evalua unicamente el monto aislado de cada orden. Si un encargado necesita adquirir ₡2 107 000 en varilla (como ocurrio entre <code>OC-1050</code> por ₡1 075 000 y <code>OC-1053</code> por ₡1 032 000 emitidas con un dia de diferencia) o divide una compra de ₡900 000 en cuatro pedidos de ₡225 000, logra mantenerse artificialmente bajo el umbral de ₡2 000 000 o de ₡250 000. Los riesgos directos son: (1) <strong>Evasion de controles jerarquicos y cotizaciones</strong> (autoaprobacion con una sola cotizacion en lugar de 2 o 3); (2) <strong>Perdida de descuentos por volumen</strong> al comprar al menudeo; (3) <strong>Riesgo de fraude o direccionamiento</strong> hacia proveedores fuera de contrato con sobreprecio; y (4) <strong>Multiplicacion de errores operativos y pagos duplicados</strong>.
+      </p>
+      <p class="prose-p">
+        <strong>Mejoras implementadas en la matriz:</strong> (1) <strong>Regla de Acumulado Movil de 30 dias:</strong> el umbral aplicable se determina sumando todas las ordenes emitidas por la misma area solicitante hacia el mismo proveedor o subcategoria en los ultimos 30 dias naturales; (2) <strong>Exclusividad de Compras sobre Contratos Marco:</strong> ningun jefe de obra o mantenimiento puede aprobar compras directas de materiales estructurales (cemento, acero, block, agregados) fuera del contrato marco vigente, aunque el monto sea menor a ₡250 000; y (3) <strong>Bloqueo de alta de proveedores</strong> para roles operativos.
+      </p>
+    </section>
+
+    <!-- EJERCICIO A2 -->
+    <section class="report-sec">
+      <div class="sec-head">
+        <span class="sec-tag">EJERCICIO A2 (8 PTS)</span>
+        <h2 class="sec-title">Clasificacion de Categorias de Gasto, Reclasificacion ERP y Ahorro por Volumen</h2>
+      </div>
+
+      <p class="prose-p">
+        Se define una taxonomia estandarizada de dos niveles (<code>Categoria Nivel 1 &gt; Subcategoria Nivel 2</code>) junto con un codigo unico maestro (SKU) para reclasificar las 8 lineas del ERP. En ingenieria civil en Costa Rica, la denominacion <em>"Varilla #3 grado 40"</em> y <em>"Hierro 3/8 x 6 m"</em> corresponden exactamente al mismo insumo fisico (3/8 de pulgada equivale a 9.52 mm, designacion #3 en norma ASTM A615).
+      </p>
+
+      <table class="tech-table" style="margin-bottom: 1rem;">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Descripcion en el ERP</th>
+            <th>Area</th>
+            <th>Proveedor</th>
+            <th class="num-col">Cant.</th>
+            <th class="num-col">Precio Unit.</th>
+            <th class="num-col">Gasto Real</th>
+            <th>Taxonomia (Categoria &gt; Subcategoria)</th>
+            <th>Codigo SKU</th>
+            <th class="num-col">Ahorro al Menor Precio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Cemento gris 50 kg</td>
+            <td>Obras</td>
+            <td>Proveedor A</td>
+            <td class="num-col">200</td>
+            <td class="num-col">₡6 450</td>
+            <td class="num-col">₡1 290 000</td>
+            <td>Materiales de Obra Gris &gt; Cementos y Aglomerantes</td>
+            <td><code>MAT-CEM-001</code></td>
+            <td class="num-col">₡30 000</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Saco cemento uso general</td>
+            <td>Mantenimiento</td>
+            <td>Proveedor B</td>
+            <td class="num-col">40</td>
+            <td class="num-col">₡7 100</td>
+            <td class="num-col">₡284 000</td>
+            <td>Materiales de Obra Gris &gt; Cementos y Aglomerantes</td>
+            <td><code>MAT-CEM-001</code></td>
+            <td class="num-col">₡32 000</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>CEM-GRIS-50</td>
+            <td>Bodega Central</td>
+            <td>Proveedor A</td>
+            <td class="num-col">300</td>
+            <td class="num-col">₡6 300</td>
+            <td class="num-col">₡1 890 000</td>
+            <td>Materiales de Obra Gris &gt; Cementos y Aglomerantes</td>
+            <td><code>MAT-CEM-001</code></td>
+            <td class="num-col">₡0 (Base ₡6 300)</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Varilla #3 grado 40</td>
+            <td>Obras</td>
+            <td>Proveedor C</td>
+            <td class="num-col">500</td>
+            <td class="num-col">₡2 150</td>
+            <td class="num-col">₡1 075 000</td>
+            <td>Materiales de Obra Gris &gt; Acero de Refuerzo</td>
+            <td><code>MAT-ACE-003</code></td>
+            <td class="num-col">₡0 (Base ₡2 150)</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Hierro 3/8 x 6 m</td>
+            <td>Mantenimiento</td>
+            <td>Proveedor D</td>
+            <td class="num-col">60</td>
+            <td class="num-col">₡2 600</td>
+            <td class="num-col">₡156 000</td>
+            <td>Materiales de Obra Gris &gt; Acero de Refuerzo</td>
+            <td><code>MAT-ACE-003</code></td>
+            <td class="num-col">₡27 000</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Guantes de nitrilo talla L</td>
+            <td>Bodega Central</td>
+            <td>Proveedor E</td>
+            <td class="num-col">100</td>
+            <td class="num-col">₡850</td>
+            <td class="num-col">₡85 000</td>
+            <td>Seguridad Ocupacional y EPP &gt; Proteccion Manual</td>
+            <td><code>EPP-GUA-001</code></td>
+            <td class="num-col">₡0 (Base ₡850)</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>Guantes trabajo L</td>
+            <td>Obras</td>
+            <td>Proveedor F</td>
+            <td class="num-col">80</td>
+            <td class="num-col">₡1 200</td>
+            <td class="num-col">₡96 000</td>
+            <td>Seguridad Ocupacional y EPP &gt; Proteccion Manual</td>
+            <td><code>EPP-GUA-001</code></td>
+            <td class="num-col">₡28 000 (Opc. EPP)</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>Tubo PVC 1/2 SDR 13.5</td>
+            <td>Mantenimiento</td>
+            <td>Proveedor B</td>
+            <td class="num-col">25</td>
+            <td class="num-col">₡2 900</td>
+            <td class="num-col">₡72 500</td>
+            <td>Instalaciones Hidrosanitarias &gt; Tuberia PVC</td>
+            <td><code>HID-PVC-012</code></td>
+            <td class="num-col">₡0 (Unica linea)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="prose-p">
+        <strong>Calculo del ahorro en Cemento y Varilla al menor precio observado:</strong>
+        En <strong>Cemento (<code>MAT-CEM-001</code>, lineas 1, 2 y 3)</strong> se compraron 540 sacos por un total real de ₡3 464 000; si las 540 unidades se hubieran adquirido al menor precio observado de ₡6 300/saco (costo homologado de ₡3 402 000), el ahorro habria sido de <strong>₡62 000</strong> (<code>200 × ₡150 + 40 × ₡800</code>). En <strong>Varilla #3 (<code>MAT-ACE-003</code>, lineas 4 y 5)</strong> se compraron 560 unidades por ₡1 231 000; al menor precio observado en la tabla de ₡2 150/unid. (costo homologado de ₡1 204 000), el ahorro es de <strong>₡27 000</strong> (<code>60 × ₡450</code>). El <strong>ahorro conjunto en cemento y varilla es de ₡89 000</strong> (y asciende a <strong>₡117 000</strong> si se homologan tambien los 80 pares de guantes talla L de la linea 7 al precio de ₡850 de la linea 6).
+      </p>
+      <p class="prose-p">
+        <strong>Por que es imposible negociar por volumen sin esta clasificacion:</strong> Cuando cada area registra el mismo insumo bajo textos libres y codigos distintos, el ERP trata cada linea como un articulo diferente e inconexo, ocultando que la empresa demanda 540 sacos de cemento y 560 varillas en un mismo periodo. Sin una taxonomia normalizada, Compras no puede agregar la demanda corporativa para sentarse a negociar tarifas mayoristas ni contratos marco, permitiendo que las areas operativas compren lotes pequenos a precios de mostrador hasta un 20.9% mas caros.
+      </p>
+    </section>
+
+    <!-- EJERCICIO A3 -->
+    <section class="report-sec page-break">
+      <div class="sec-head">
+        <span class="sec-tag">EJERCICIO A3 (10 PTS)</span>
+        <h2 class="sec-title">Analisis de Gasto de Octubre, Deteccion de Duplicados y Cuantificacion de Fuga de Valor</h2>
+      </div>
+
+      <p class="prose-p">
+        El contrato marco vigente con el <strong>Proveedor A</strong> fija el saco de <strong>cemento gris 50 kg en ₡6 300</strong> y la <strong>varilla #3 en ₡2 050</strong>. A continuacion se audita el extracto de las 7 ordenes de compra de octubre (gasto bruto facturado: <strong>₡7 017 000</strong>):
+      </p>
+
+      <table class="tech-table" style="margin-bottom: 1.15rem;">
+        <thead>
+          <tr>
+            <th>OC</th>
+            <th>Fecha</th>
+            <th>Area</th>
+            <th>Proveedor</th>
+            <th>Articulo</th>
+            <th class="num-col">Cant.</th>
+            <th class="num-col">Precio OC</th>
+            <th class="num-col">Precio Contrato</th>
+            <th class="num-col">Total OC</th>
+            <th class="num-col">Sobreprecio Unit.</th>
+            <th class="num-col">Sobreprecio Linea</th>
+            <th>Hallazgo de Auditoria</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>OC-1041</code></td>
+            <td>02/10</td>
+            <td>Obras</td>
+            <td>Prov. A</td>
+            <td>Cemento gris 50 kg</td>
+            <td class="num-col">200</td>
+            <td class="num-col">₡6 450</td>
+            <td class="num-col">₡6 300</td>
+            <td class="num-col">₡1 290 000</td>
+            <td class="num-col">+₡150</td>
+            <td class="num-col">₡30 000</td>
+            <td>Tarifa superior al contrato (+2.38%)</td>
+          </tr>
+          <tr class="row-critical">
+            <td><code>OC-1042</code></td>
+            <td>02/10</td>
+            <td>Obras</td>
+            <td>Prov. A</td>
+            <td>Cemento gris 50 kg</td>
+            <td class="num-col">200</td>
+            <td class="num-col">₡6 450</td>
+            <td class="num-col">₡6 300</td>
+            <td class="num-col">₡1 290 000</td>
+            <td class="num-col">+₡150</td>
+            <td class="num-col">₡30 000</td>
+            <td><strong>DUPLICADA EXACTA de OC-1041</strong> + Sobreprecio</td>
+          </tr>
+          <tr>
+            <td><code>OC-1047</code></td>
+            <td>06/10</td>
+            <td>Mant.</td>
+            <td>Prov. B</td>
+            <td>Cemento gris 50 kg</td>
+            <td class="num-col">40</td>
+            <td class="num-col">₡7 100</td>
+            <td class="num-col">₡6 300</td>
+            <td class="num-col">₡284 000</td>
+            <td class="num-col">+₡800</td>
+            <td class="num-col">₡32 000</td>
+            <td><strong>Fuera de contrato</strong> (Prov. B) + Sobreprecio (+12.70%)</td>
+          </tr>
+          <tr>
+            <td><code>OC-1050</code></td>
+            <td>08/10</td>
+            <td>Obras</td>
+            <td>Prov. C</td>
+            <td>Varilla #3</td>
+            <td class="num-col">500</td>
+            <td class="num-col">₡2 150</td>
+            <td class="num-col">₡2 050</td>
+            <td class="num-col">₡1 075 000</td>
+            <td class="num-col">+₡100</td>
+            <td class="num-col">₡50 000</td>
+            <td><strong>Fuera de contrato</strong> (Prov. C) + Sobreprecio (+4.88%)</td>
+          </tr>
+          <tr class="row-critical">
+            <td><code>OC-1053</code></td>
+            <td>09/10</td>
+            <td>Obras</td>
+            <td>Prov. C</td>
+            <td>Varilla #3</td>
+            <td class="num-col">480</td>
+            <td class="num-col">₡2 150</td>
+            <td class="num-col">₡2 050</td>
+            <td class="num-col">₡1 032 000</td>
+            <td class="num-col">+₡100</td>
+            <td class="num-col">₡48 000</td>
+            <td><strong>CUASI-DUPLICADA / FRACCIONADA de OC-1050</strong> + Fuera contrato</td>
+          </tr>
+          <tr>
+            <td><code>OC-1058</code></td>
+            <td>13/10</td>
+            <td>Mant.</td>
+            <td>Prov. D</td>
+            <td>Varilla #3</td>
+            <td class="num-col">60</td>
+            <td class="num-col">₡2 600</td>
+            <td class="num-col">₡2 050</td>
+            <td class="num-col">₡156 000</td>
+            <td class="num-col">+₡550</td>
+            <td class="num-col">₡33 000</td>
+            <td><strong>Fuera de contrato</strong> (Prov. D) + Sobreprecio (+26.83%)</td>
+          </tr>
+          <tr>
+            <td><code>OC-1061</code></td>
+            <td>15/10</td>
+            <td>Bodega</td>
+            <td>Prov. A</td>
+            <td>Cemento gris 50 kg</td>
+            <td class="num-col">300</td>
+            <td class="num-col">₡6 300</td>
+            <td class="num-col">₡6 300</td>
+            <td class="num-col">₡1 890 000</td>
+            <td class="num-col">₡0</td>
+            <td class="num-col">₡0</td>
+            <td>Cumplimiento estricto del Contrato Marco</td>
+          </tr>
+          <tr style="background: var(--bg-subtle); font-weight: 700;">
+            <td colspan="8">TOTAL EXTRACTO OCTUBRE (SOBREPRECIO DIRECTO ACUMULADO EN LAS 7 LINEAS)</td>
+            <td class="num-col">₡7 017 000</td>
+            <td class="num-col">—</td>
+            <td class="num-col" style="color: var(--accent-vermilion);">₡223 000</td>
+            <td>Gasto en proveedores fuera de contrato: ₡2 547 000 (36.3%)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="prose-p">
+        <strong>1. Identificacion de compras duplicadas y criterio utilizado:</strong> Se definio la regla parametrica que marca alerta cuando dos ordenes coinciden en <code>Proveedor + Articulo normalizado</code> dentro de una ventana temporal <code>&lt;= 3 dias</code> y con una variacion de cantidad <code>&lt;= 10%</code>. Bajo esta regla se detectan dos casos: (a) <strong><code>OC-1041</code> y <code>OC-1042</code> (Duplicado Exacto):</strong> emitidas el mismo dia (<code>02/10</code>) por Obras al Proveedor A por exactamente 200 sacos de cemento a ₡6 450 (variacion 0%, desembolso duplicado de <strong>₡1 290 000</strong>); y (b) <strong><code>OC-1050</code> y <code>OC-1053</code> (Duplicado Cuasi-Exacto / Fraccionamiento):</strong> emitidas en dias consecutivos (<code>08/10</code> y <code>09/10</code>) por Obras al Proveedor C por 500 y 480 varillas (variacion de apenas 4.0%), sumando <strong>₡2 107 000</strong> para evadir el umbral de aprobacion de ₡2 000 000 de la Gerencia Financiera.
+      </p>
+      <p class="prose-p">
+        <strong>2. Cuantificacion de la fuga de valor mensual y proyeccion anual:</strong>
+        <br/>• <strong>Escenario A (Fuga por Sobreprecio Tarifario Puro):</strong> Asumiendo que todas las unidades fisicas fueron requeridas en obra, el sobreprecio pagado frente al contrato del Proveedor A es de <strong>₡223 000 en octubre</strong> (<code>₡30 000 + ₡30 000 + ₡32 000 + ₡50 000 + ₡48 000 + ₡33 000</code>), lo que proyecta una perdida anual de <strong>₡2 676 000/ano</strong>.
+        <br/>• <strong>Escenario B (Fuga Consolidada: Sobreprecios + Orden Duplicada Exacta <code>OC-1042</code>):</strong> Al contabilizar la emision doble de <code>OC-1042</code> (₡1 290 000) mas los sobreprecios de las demas ordenes (₡193 000), la fuga mensual asciende a <strong>₡1 483 000/mes</strong>, equivalente a una proyeccion anual de <strong>₡17 796 000/ano</strong>.
+        <br/>• <strong>Escenario C (Si <code>OC-1053</code> tambien fue emitida por error como duplicado):</strong> La fuga mensual alcanza <strong>₡2 467 000/mes</strong> (<strong>₡29 604 000/ano</strong>).
+      </p>
+      <p class="prose-p">
+        <strong>3. Tres controles concretos propuestos:</strong> (1) <strong>Bloqueo de precio y proveedor en ERP para articulos con Contrato Marco activo</strong> (impide digitar ₡6 450 en el Proveedor A o comprar cemento/varilla a los Proveedores B, C y D sin liberacion de Gerencia); (2) <strong>Validacion automatica pre-emision de huella de duplicidad</strong> (bloquea cualquier OC que repita proveedor, SKU y cantidad ±10% en menos de 72 horas); y (3) <strong>Acumulado movil de 30 dias en la matriz de aprobacion + Cotejo Three-Way Match obligatorio</strong> antes de autorizar pagos.
+      </p>
+    </section>
+
+    <!-- EJERCICIO A4 -->
+    <section class="report-sec">
+      <div class="sec-head">
+        <span class="sec-tag">EJERCICIO A4 (7 PTS)</span>
+        <h2 class="sec-title">Matriz Ponderada de Evaluacion de Proveedores y Estrategia de Consolidacion</h2>
+      </div>
+
+      <table class="tech-table" style="margin-bottom: 1rem;">
+        <thead>
+          <tr>
+            <th>Criterio de Evaluacion</th>
+            <th class="num-col">Peso (%)</th>
+            <th class="num-col">Construplaza (Nota 1-5 / Pond.)</th>
+            <th class="num-col">Novex (Nota 1-5 / Pond.)</th>
+            <th class="num-col">EPA (Nota 1-5 / Pond.)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1. Precio competitivo y descuentos por volumen</td>
+            <td class="num-col">25%</td>
+            <td class="num-col">5.0 &rarr; <strong>1.25</strong></td>
+            <td class="num-col">4.0 &rarr; <strong>1.00</strong></td>
+            <td class="num-col">2.0 &rarr; <strong>0.50</strong></td>
+          </tr>
+          <tr>
+            <td>2. Calidad certificada (cumplimiento INTECO / ASTM)</td>
+            <td class="num-col">20%</td>
+            <td class="num-col">5.0 &rarr; <strong>1.00</strong></td>
+            <td class="num-col">5.0 &rarr; <strong>1.00</strong></td>
+            <td class="num-col">4.0 &rarr; <strong>0.80</strong></td>
+          </tr>
+          <tr>
+            <td>3. Cumplimiento de plazos de entrega en obra (OTIF)</td>
+            <td class="num-col">20%</td>
+            <td class="num-col">4.0 &rarr; <strong>0.80</strong></td>
+            <td class="num-col">5.0 &rarr; <strong>1.00</strong></td>
+            <td class="num-col">3.0 &rarr; <strong>0.60</strong></td>
+          </tr>
+          <tr>
+            <td>4. Condiciones de credito y plazo de pago (30-60 dias)</td>
+            <td class="num-col">15%</td>
+            <td class="num-col">5.0 &rarr; <strong>0.75</strong></td>
+            <td class="num-col">4.0 &rarr; <strong>0.60</strong></td>
+            <td class="num-col">2.0 &rarr; <strong>0.30</strong></td>
+          </tr>
+          <tr>
+            <td>5. Servicio posventa, devoluciones y soporte tecnico</td>
+            <td class="num-col">10%</td>
+            <td class="num-col">4.0 &rarr; <strong>0.40</strong></td>
+            <td class="num-col">4.0 &rarr; <strong>0.40</strong></td>
+            <td class="num-col">4.0 &rarr; <strong>0.40</strong></td>
+          </tr>
+          <tr>
+            <td>6. Cobertura geografica y mitigacion de dependencia</td>
+            <td class="num-col">10%</td>
+            <td class="num-col">4.0 &rarr; <strong>0.40</strong></td>
+            <td class="num-col">4.0 &rarr; <strong>0.40</strong></td>
+            <td class="num-col">5.0 &rarr; <strong>0.50</strong></td>
+          </tr>
+          <tr style="background: var(--bg-subtle); font-weight: 700;">
+            <td>PUNTAJE PONDERADO TOTAL (SUMA = 100%)</td>
+            <td class="num-col">100%</td>
+            <td class="num-col" style="color: var(--accent-oxide);">4.60 / 5.00 (92%)</td>
+            <td class="num-col" style="color: var(--accent-cobalt);">4.40 / 5.00 (88%)</td>
+            <td class="num-col" style="color: var(--accent-amber);">3.10 / 5.00 (62%)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="prose-p">
+        <strong>Argumentacion estrategica (Consolidar vs. Mantener dos proveedores):</strong> No conviene depender al 100% de un unico proveedor en construccion civil porque una falla de flota, rotura de inventario o bloqueo vial paralizaria las fundiciones de concreto en obra (alto costo por cuadrillas inactivas). Tampoco conviene dispersar las compras en cuatro o cinco ferreterias minoristas como ocurrio en octubre. La decision optima es una <strong>consolidacion bajo esquema Dual Sourcing 80/20 con dos proveedores homologados</strong>: adjudicar el <strong>80% del volumen anual a Construplaza (4.60 pts)</strong> como proveedor principal para capturar los mejores precios de contrato y credito a 60 dias, y mantener el <strong>20% con Novex (4.40 pts)</strong> como proveedor secundario activo (destaca con 5.0 en puntualidad de entrega OTIF), eliminando por completo las compras de emergencia con sobreprecio en EPA (3.10 pts).
+      </p>
+    </section>
+
+    <!-- EJERCICIO A5 -->
+    <section class="report-sec">
+      <div class="sec-head">
+        <span class="sec-tag">EJERCICIO A5 (7 PTS)</span>
+        <h2 class="sec-title">Calculo de Stock de Seguridad, Punto de Reorden, Prioridades y Trazabilidad</h2>
+      </div>
+
+      <p class="prose-p">
+        Aplicando las formulas de referencia <code>SS = (d_max − d_prom) × L</code> y <code>PR = (d_prom × L) + SS</code> sobre los cuatro materiales criticos:
+      </p>
+
+      <table class="tech-table" style="margin-bottom: 1rem;">
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th class="num-col">Demanda Prom. (d)</th>
+            <th class="num-col">Demanda Max.</th>
+            <th class="num-col">Tiempo Entrega (L)</th>
+            <th class="num-col">Stock Seguridad (SS)</th>
+            <th class="num-col">Punto Reorden (PR)</th>
+            <th class="num-col">Stock Actual</th>
+            <th class="num-col">Holgura / Deficit</th>
+            <th>Reponer Hoy y Orden de Prioridad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-critical">
+            <td><strong>Arena (m3)</strong></td>
+            <td class="num-col">6 m3/d</td>
+            <td class="num-col">10 m3/d</td>
+            <td class="num-col">2 dias</td>
+            <td class="num-col"><strong>8 m3</strong> <code>(10-6)×2</code></td>
+            <td class="num-col"><strong>20 m3</strong> <code>12+8</code></td>
+            <td class="num-col">14 m3</td>
+            <td class="num-col" style="color: var(--accent-vermilion); font-weight: 700;">−6 m3 (70% PR)</td>
+            <td><strong>SI — PRIORIDAD #1 (Urgencia Inmediata)</strong></td>
+          </tr>
+          <tr class="row-critical">
+            <td><strong>Block 12 × 20 × 40</strong></td>
+            <td class="num-col">600 unid./d</td>
+            <td class="num-col">900 unid./d</td>
+            <td class="num-col">4 dias</td>
+            <td class="num-col"><strong>1 200 unid.</strong> <code>300×4</code></td>
+            <td class="num-col"><strong>3 600 unid.</strong> <code>2400+1200</code></td>
+            <td class="num-col">2 800 unid.</td>
+            <td class="num-col" style="color: var(--accent-vermilion); font-weight: 700;">−800 unid. (77.8% PR)</td>
+            <td><strong>SI — PRIORIDAD #2 (Urgente Hoy)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Varilla #3</strong></td>
+            <td class="num-col">120 unid./d</td>
+            <td class="num-col">160 unid./d</td>
+            <td class="num-col">5 dias</td>
+            <td class="num-col"><strong>200 unid.</strong> <code>40×5</code></td>
+            <td class="num-col"><strong>800 unid.</strong> <code>600+200</code></td>
+            <td class="num-col">850 unid.</td>
+            <td class="num-col" style="color: var(--accent-amber); font-weight: 600;">+50 unid. (106.3% PR)</td>
+            <td>NO HOY — <strong>Prioridad #3 (Preventiva: 0.42d para PR)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Cemento gris 50 kg</strong></td>
+            <td class="num-col">40 sacos/d</td>
+            <td class="num-col">55 sacos/d</td>
+            <td class="num-col">3 dias</td>
+            <td class="num-col"><strong>45 sacos</strong> <code>15×3</code></td>
+            <td class="num-col"><strong>165 sacos</strong> <code>120+45</code></td>
+            <td class="num-col">190 sacos</td>
+            <td class="num-col" style="color: var(--accent-oxide); font-weight: 600;">+25 sacos (115.2% PR)</td>
+            <td>NO HOY — <strong>Prioridad #4 (Monitoreo: 0.63d para PR)</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="prose-p">
+        <strong>Justificacion de reposicion y prioridad:</strong> Deben reponerse hoy mismo la <strong>Arena (m3)</strong> y el <strong>Block 12 × 20 × 40</strong> porque sus existencias actuales (14 m3 y 2 800 unidades) ya cayeron por debajo de sus respectivos Puntos de Reorden (20 m3 y 3 600 unidades). La <strong>Prioridad #1 es la Arena</strong> porque se encuentra al 70.0% de su PR, ya consumio el 75% de su stock de seguridad (6 m3 de 8 m3) y solo cuenta con 2.33 dias de autonomia fisica frente a un tiempo de entrega de 2 dias. La <strong>Prioridad #2 es el Block 12×20×40</strong>, que se encuentra al 77.8% de su PR (deficit de 800 unidades, habiendo consumido el 66.7% de su stock de seguridad) y posee un tiempo de entrega de 4 dias. Por su parte, la Varilla #3 (+50 unid. sobre el PR) y el Cemento (+25 sacos sobre el PR) cruzaran su punto de reorden en el transcurso de la siguiente jornada laboral, por lo que el sistema emite alerta preventiva.
+      </p>
+      <p class="prose-p">
+        <strong>Datos minimos obligatorios por movimiento para trazabilidad completa:</strong> Cada registro en la tabla <code>movimientos_inventario</code> captura: (1) <code>codigo_movimiento</code> unico e inmutable; (2) <code>fecha_hora</code> exacta ISO-8601; (3) <code>tipo_movimiento</code> (<code>ENTRADA</code>, <code>SALIDA</code>, <code>TRASLADO</code>, <code>AJUSTE</code>); (4) <code>material_id</code> (SKU estandarizado); (5) <code>cantidad</code> y <code>costo_unitario_colones</code>; (6) <code>ubicacion_origen_id</code> y <code>ubicacion_destino_id</code> (bodega u obra que entrega y recibe); (7) <code>documento_origen</code> y <code>orden_compra_id</code> (vinculo directo a la OC y boleta de recepcion en entradas, o al vale de salida autorizado en consumos); (8) <code>lote_serie</code> (numero de lote de cemento, colada de acero o tajo de arena); (9) <code>usuario_responsable</code> que ejecuta y aprueba; y (10) <code>saldo_resultante_material</code> post-movimiento.
+      </p>
+    </section>
+
+    <!-- PARTE B Y CONCLUSIONES -->
+    <section class="report-sec">
+      <div class="sec-head">
+        <span class="sec-tag">PARTE B (60 PTS + EXTRA)</span>
+        <h2 class="sec-title">Descripcion de la Solucion Implementada, Modelo de Datos y Conclusiones</h2>
+      </div>
+
+      <p class="prose-p">
+        <strong>Arquitectura de la solucion construida (Camino 2 — Back end propio en Node.js + Base de Datos SQLite + Dashboard e Integraciones):</strong> Se implemento la <strong>Opcion 2 (Control de inventario para Constructora Del Valle S.A.)</strong> integrada además con el <strong>Comparador de Precios de Proveedores (Opcion 1)</strong> y con el <strong>Motor de Matriz de Aprobacion de A1</strong>. El servidor esta estructurado en capas (<code>src/db/schema.sql</code>, <code>src/db/seed.sql</code>, <code>src/services/reorden.js</code>, <code>src/services/duplicados.js</code>, <code>src/services/aprobaciones.js</code> y <code>src/routes/api.js</code>), cumpliendo con pruebas automatizadas ejecutables mediante <code>npm test</code>.
+      </p>
+      <p class="prose-p">
+        <strong>Conclusiones de negocio e ingenieria:</strong>
+        <br/>1. <strong>Impacto financiero directo:</strong> La auditoria demostro que la falta de un catalogo normalizado y de controles en la emision de ordenes genero en un solo mes ₡223 000 en sobreprecios tarifarios y ₡1 290 000 por una orden duplicada exacta (<code>OC-1042</code>), proyectando una fuga anual de <strong>₡17 796 000</strong> que se neutraliza completamente con las reglas programadas en el back end.
+        <br/>2. <strong>Continuidad operativa en obra:</strong> Automatizar el calculo dinamico del Punto de Reorden (<code>PR = d × L + SS</code>) a partir de los movimientos reales del Kardex permite anticipar el reabastecimiento de insumos criticos como la Arena y el Block antes de que se agote el stock de seguridad y se detengan las cuadrillas en obra.
+      </p>
+    </section>
+  </article>
+</body>
+</html>
